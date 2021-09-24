@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
     {% if user.is_authenticated %}
-        <h1>Hi {{ user.username }} 🤠! </h1>
-        <p><a href="{% url 'logout' %}">logout</a></p>
+        {% if user.is_instructor %}
+            <h1>Hi Instructor {{ user.username }} </h1>
+            <p><a href="{% url 'logout' %}">logout</a></p>
+        {% else %}
+            <h1>Hi {{ user.username }} 🤠! </h1>
+            <p><a href="{% url 'logout' %}">logout</a></p>
+        {% endif %}
     {% else %}
         <h1>You are not logged in!</h1>
         <a href="{% url 'login' %}">Login</a> |
