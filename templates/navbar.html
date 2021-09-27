@@ -14,7 +14,7 @@
       <ul class="navbar-nav ms-auto mb-2 mb-large-0">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Logout</a>
+            <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Logout</a>
           </li>
         {% else %}
           <li class="nav-item">
