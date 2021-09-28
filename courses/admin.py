@@ -8,11 +8,11 @@ class CourseAdmin(admin.ModelAdmin):
     # add_form = AppUserCreationForm
     # form = AppUserChangeForm
     model = Course
-    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('slug',)
     # list_display = ['name', ]
     # fieldsets = UserAdmin.fieldsets + (
     #         (None, {'fields': ('is_instructor',)}),
     # )
 
 
-admin.site.register(Course)
+admin.site.register(Course, CourseAdmin)

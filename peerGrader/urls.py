@@ -25,4 +25,5 @@ urlpatterns = [
     path('', users.views.homeView, name='home'),
     path('users/', include(('users.urls', 'users'))),
     path('users/', include('django.contrib.auth.urls')),
+    path('courses/', include(('courses.urls', 'courses'))),
 ]
