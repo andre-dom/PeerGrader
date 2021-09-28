@@ -10,7 +10,7 @@
                         <h2>{{ Course.name }}</h2>
                     </div>
                     <div>
-                        <a href="#" class="btn btn-primary">View</a>
+                        <a href="{% url 'courses:view_course' Course.slug %}" class="btn btn-primary">View</a>
                     </div>
                 </div>
             </div>
