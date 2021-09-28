@@ -8,6 +8,7 @@ class CourseAdmin(admin.ModelAdmin):
     # add_form = AppUserCreationForm
     # form = AppUserChangeForm
     model = Course
+    prepopulated_fields = {'slug': ('name',)}
     # list_display = ['name', ]
     # fieldsets = UserAdmin.fieldsets + (
     #         (None, {'fields': ('is_instructor',)}),
