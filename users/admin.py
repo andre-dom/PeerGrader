@@ -16,7 +16,7 @@ class AppUserAdmin(UserAdmin):
     list_display = ['username', 'is_instructor']
     fieldsets = UserAdmin.fieldsets + (
             (None, {'fields': ('is_instructor',)}),
-    ) #this will allow to change these fields in admin module
+    )
 
 
 admin.site.register(AppUser, AppUserAdmin)
