@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 
+from courses.models import Course
 from .forms import AppUserCreationForm
 
 
@@ -16,4 +17,5 @@ def homeView(request):
         return render(request, 'home.html')
     if request.user.is_instructor:
         return render(request, 'users/instructorhome.html')
-    return render(request, 'users/studenthome.html')
+    student_courses = Course.objects.filter(students=request.user)
+    return render(request, 'users/studenthome.html', {'student_courses': student_courses, })

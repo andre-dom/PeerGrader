@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Hi {{ user.username }} 🤠! </h1>
-    <p><a href="{% url 'logout' %}">logout</a></p>
+
+    {% for Course in student_courses %}
+        <div class="card mt-3">
+            <h2>{{ Course.name }}</h2>
+            <h3>{{ Course.instructor.username }}</h3>
+        </div>
+    {% endfor %}
+
 {% endblock content %}
