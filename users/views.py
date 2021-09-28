@@ -18,7 +18,17 @@ def homeView(request):
         return render(request, 'home.html')
 
     if request.user.is_instructor:
-        instructor_courses = Course.objects.filter(instructor=request.user)
+        instructor_courses_list = Course.objects.filter(instructor=request.user)
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(instructor_courses_list, 5)
+        try:
+            instructor_courses = paginator.page(page)
+        except PageNotAnInteger:
+            instructor_courses = paginator.page(1)
+        except EmptyPage:
+            instructor_courses = paginator.page(paginator.num_pages)
+
         return render(request, 'users/instructorhome.html', {'instructor_courses': instructor_courses, })
 
     student_courses_list = Course.objects.filter(students=request.user)
