@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from courses.models import Course
 from .forms import AppUserCreationForm
@@ -15,8 +16,18 @@ class SignUpView(CreateView):
 def homeView(request):
     if not request.user.is_authenticated:
         return render(request, 'home.html')
+
     if request.user.is_instructor:
         instructor_courses = Course.objects.filter(instructor=request.user)
         return render(request, 'users/instructorhome.html', {'instructor_courses': instructor_courses, })
-    student_courses = Course.objects.filter(students=request.user)
+
+    student_courses_list = Course.objects.filter(students=request.user)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(student_courses_list, 5)
+    try:
+        student_courses = paginator.page(page)
+    except PageNotAnInteger:
+        student_courses = paginator.page(1)
+    except EmptyPage:
+        student_courses = paginator.page(paginator.num_pages)
     return render(request, 'users/studenthome.html', {'student_courses': student_courses, })

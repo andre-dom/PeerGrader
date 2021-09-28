@@ -2,11 +2,45 @@
 {% block content %}
     <h1>Hi {{ user.username }} 🤠! </h1>
 
-    {% for Course in student_courses %}
-        <div class="card mt-3">
-            <h2>{{ Course.name }}</h2>
-            <h3>{{ Course.instructor.username }}</h3>
-        </div>
-    {% endfor %}
+    {% if student_courses %}
+        {% for Course in student_courses %}
+            <div class="card mt-3 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>{{ Course.name }}</h2>
+                        <hr>
+                        <h3>{{ Course.instructor.username }}</h3>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-primary">View</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% if student_courses.has_other_pages %}
+            <ul class="mt-3 pagination justify-content-center">
+                {% if student_courses.has_previous %}
+                    <li><a class="page-link" href="?page={{ student_courses.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="disabled page-link text-muted"><span>&laquo;</span></li>
+                {% endif %}
+                {% for i in student_courses.paginator.page_range %}
+                    {% if users.number == i %}
+                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                        <li><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if student_courses.has_next %}
+                    <li><a class="page-link" href="?page={{ student_courses.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="disabled page-link text-muted"><span>&raquo;</span></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
+    {% else %}
+        <h3>You are not currently enrolled in any classes.</h3>
+    {% endif %}
 
 {% endblock content %}
