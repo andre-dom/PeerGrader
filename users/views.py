@@ -15,7 +15,7 @@ class SignUpView(CreateView):
 
 def homeView(request):
     if not request.user.is_authenticated:
-        return render(request, 'home.html')
+        return render(request, 'landing.html')
 
     if request.user.is_instructor:
         instructor_courses_list = Course.objects.filter(instructor=request.user)
