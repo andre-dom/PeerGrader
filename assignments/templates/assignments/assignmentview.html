@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="d-inline">Assignment: {{ assignment.name }}</h1>
+            <p>Due: {{ assignment.due_date }}</p>
+            <a class="btn btn-primary" href="{% url 'home' %}">← Back</a>
+        </div>
+    </div>
+{% endblock content %}

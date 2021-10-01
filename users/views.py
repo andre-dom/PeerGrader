@@ -13,7 +13,7 @@ class SignUpView(CreateView):
     template_name = 'registration/signup.html'
 
 
-def homeView(request):
+def home_view(request):
     if not request.user.is_authenticated:
         return render(request, 'landing.html')
 
