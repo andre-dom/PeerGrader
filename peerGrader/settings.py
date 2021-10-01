@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     
     # extras
     'crispy_forms',
+    'nested_admin',
 ]
 
 # use our custom user model

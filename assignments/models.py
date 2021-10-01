@@ -14,6 +14,15 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateTimeField(default=utc.localize(datetime.now() + timedelta(days=1)),
                                     validators=[MinValueValidator(limit_value=utc.localize(datetime.now()))])
-    course = models.ForeignKey('courses.Course', related_name='assignments', on_delete=models.CASCADE,)
+    course = models.ForeignKey('courses.Course', related_name='assignments', on_delete=models.CASCADE, )
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
 
+    def __str__(self):
+        return self.name
+
+
+class Question(models.Model):
+    question_body = models.TextField()
+    point_value = models.IntegerField(validators=[MinValueValidator(0)])
+    assignment = models.ForeignKey('Assignment', related_name='questions', on_delete=models.CASCADE, )
+    index = models.IntegerField(validators=[MinValueValidator(1)])
