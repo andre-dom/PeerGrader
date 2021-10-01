@@ -9,7 +9,7 @@ from assignments.models import Assignment
 
 class AssignmentView(DetailView):
     model = Assignment
-    template_name = 'courses/assignmentview.html'
+    template_name = 'assignments/assignmentview.html'
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
 
