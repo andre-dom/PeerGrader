@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.text import slugify
 from autoslug import AutoSlugField
 
 import peerGrader.settings
@@ -15,3 +14,6 @@ class Course(models.Model):
                                       limit_choices_to={'is_instructor': False},
                                       related_name='enrolled_class')
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
+
+    def __str__(self):
+        return self.name

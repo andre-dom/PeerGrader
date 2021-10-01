@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # myapps
     'users.apps.UsersConfig',
     'courses.apps.CoursesConfig',
+    'assignments.apps.AssignmentsConfig',
     
     # extras
     'crispy_forms',
