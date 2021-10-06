@@ -25,6 +25,7 @@ urlpatterns = [
     path('', users.views.home_view, name='home'),
     path('users/', include(('users.urls', 'users'))),
     path('users/', include('django.contrib.auth.urls')),
+    # path('courses/<slug:slug>/assignments', include(('assignments.urls', 'assignments'))),
     path('courses/', include(('courses.urls', 'courses'))),
     path('assignments/', include(('assignments.urls', 'assignments'))),
 ]

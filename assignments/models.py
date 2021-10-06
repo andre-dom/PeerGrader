@@ -20,6 +20,15 @@ class Assignment(models.Model):
     def __str__(self):
         return self.name
 
+    def numQuestions(self):
+        return len(self.questions.values())
+
+    def pointTotal(self):
+        t = 0
+        for q in self.questions:
+            t += q.point_value
+        return t
+
 
 class Question(models.Model):
     question_body = models.TextField()
