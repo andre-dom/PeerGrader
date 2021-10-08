@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from courses.models import Course
 from .forms import AppUserCreationForm
+from .models import AppUser
 
 
 class SignUpView(CreateView):
@@ -12,6 +13,15 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('home')
     template_name = 'registration/signup.html'
 
+
+class EditUsername(UpdateView):
+    model = AppUser
+    success_url = reverse_lazy('home')
+    template_name = 'registration/changeusername.html'
+    fields = ('username',)
+
+    def get_object(self):
+        return self.request.user
 
 def home_view(request):
     if not request.user.is_authenticated:
