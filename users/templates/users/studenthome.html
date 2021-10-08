@@ -23,7 +23,7 @@
                 {% if student_courses.has_previous %}
                     <li><a class="page-link" href="?page={{ student_courses.previous_page_number }}">&laquo;</a></li>
                 {% else %}
-                    <li class="disabled page-link text-muted"><span>&laquo;</span></li>
+                    <li class="disabled page-item"><a class="page-link" href="#">&laquo;</a></li>
                 {% endif %}
                 {% for i in student_courses.paginator.page_range %}
                     {% if users.number == i %}
@@ -35,7 +35,7 @@
                 {% if student_courses.has_next %}
                     <li><a class="page-link" href="?page={{ student_courses.next_page_number }}">&raquo;</a></li>
                 {% else %}
-                    <li class="disabled page-link text-muted"><span>&raquo;</span></li>
+                    <li class="disabled page-item"><a class="page-link" href="#">&raquo;</a></li>
                 {% endif %}
             </ul>
         {% endif %}

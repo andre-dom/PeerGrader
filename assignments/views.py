@@ -27,6 +27,7 @@ class CreateAssignment(CreateView):
         form.instance.course = Course.objects.get(slug=self.kwargs['course_slug'])
         return super(CreateAssignment, self).form_valid(form)
 
+
 class DeleteAssignment(DeleteView):
     model = Assignment
     slug_url_kwarg = 'slug'
