@@ -2,9 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 # Create your views here.
+from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView
 
 from assignments.models import Assignment
+from courses.models import Course
 
 
 class AssignmentView(DetailView):
@@ -19,8 +21,11 @@ class CreateAssignment(CreateView):
     template_name = 'assignments/createassignment.html'
     fields = ('name', 'due_date',)
 
-    # def form_valid(self, form):
-    #     form.instance.assignment =
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        form.instance.course = Course.objects.get(slug=self.kwargs['course_slug'])
+        return super(CreateAssignment, self).form_valid(form)
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())
