@@ -36,6 +36,15 @@ class DeleteAssignment(DeleteView):
     template_name = 'assignments/deleteassignment.html'
 
 
+class PublishAssignment(UpdateView):
+    model = Assignment
+    template_name = 'assignments/publish_assignment.html'
+    fields = ('is_published',)
+    slug_url_kwarg = 'slug'
+    slug_field = 'slug'
+    success_url = "/"
+
+
 class CreateQuestion(CreateView):
     model = Question
     template_name = 'questions/createquestion.html'
@@ -76,6 +85,7 @@ class DeleteQuestion(DeleteView):
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
+assignment_publish_view = login_required(PublishAssignment.as_view())
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
