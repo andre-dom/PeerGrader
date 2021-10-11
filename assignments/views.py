@@ -3,9 +3,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, CreateView, DeleteView
+from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 
-from assignments.models import Assignment
+from assignments.models import Assignment, Question
 from courses.models import Course
 
 
@@ -36,6 +36,29 @@ class DeleteAssignment(DeleteView):
     template_name = 'assignments/deleteassignment.html'
 
 
+class CreateQuestion(CreateView):
+    model = Question
+    template_name = 'questions/createquestion.html'
+    fields = ('question_body', 'point_value',)
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        form.instance.assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        form.instance.index = Assignment.objects.get(slug=self.kwargs['assignment_slug']).numQuestions() + 1
+        return super(CreateQuestion, self).form_valid(form)
+
+
+class EditQuestion(UpdateView):
+    model = Question
+    template_name = 'questions/editquestion.html'
+    fields = ('question_body', 'point_value',)
+    slug_url_kwarg = 'slug'
+    slug_field = 'slug'
+    success_url = "/"
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
+question_edit_view = login_required(EditQuestion.as_view())
+question_create_view = login_required(CreateQuestion.as_view())
