@@ -52,9 +52,13 @@ class EditQuestion(UpdateView):
     model = Question
     template_name = 'questions/editquestion.html'
     fields = ('question_body', 'point_value',)
-    slug_url_kwarg = 'slug'
-    slug_field = 'slug'
+    slug_url_kwarg = 'index'
+    slug_field = 'index'
     success_url = "/"
+
+    def get_queryset(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())

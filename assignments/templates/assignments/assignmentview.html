@@ -23,7 +23,8 @@
                         {#                        {% if user.is_authenticated and user.is_instructor %}#}
                         {#                            <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>#}
                         {#                        {% endif %}#}
-                        <a href="#" class="btn btn-primary">View</a>
+                        <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
+{#                        <a href="#" class="btn btn-primary">View</a>#}
                     </div>
                 </div>
             </div>

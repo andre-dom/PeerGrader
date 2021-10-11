@@ -8,4 +8,5 @@ urlpatterns = [
     path('<slug:slug>/', assignments.views.assignment_detail_view, name='view_assignment'),
     path('<slug:slug>/delete/', assignments.views.assignment_delete_view, name='delete_assignment'),
     path('<slug:assignment_slug>/newquestion/', assignments.views.question_create_view, name='create_question'),
+    path('<slug:assignment_slug>/editquestion/<int:index>', assignments.views.question_edit_view, name='edit_question'),
 ]
