@@ -2,10 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2>Create an assignment</h2>
+    <h2>Delete assignment</h2>
     <form method="post">
-      {% csrf_token %}
-      <p>Are you sure you want to delete "{{ object }}"?</p>
-      <button type="submit" value="Confirm" class="btn btn-danger mt-3">Delete Assignment</button>
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        <button type="submit" value="Confirm" class="btn btn-danger mt-3">Delete Assignment</button>
+        <a class="btn btn-outline-secondary mt-3" href="{%  url 'home' %}">No, don't delete</a>
     </form>
 {% endblock %}

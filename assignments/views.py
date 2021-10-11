@@ -61,8 +61,21 @@ class EditQuestion(UpdateView):
         return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
 
 
+class DeleteQuestion(DeleteView):
+    model = Question
+    slug_url_kwarg = 'index'
+    slug_field = 'index'
+    success_url = "/"
+    template_name = 'questions/deletequestion.html'
+
+    def get_queryset(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
+question_delete_view = login_required(DeleteQuestion.as_view())
