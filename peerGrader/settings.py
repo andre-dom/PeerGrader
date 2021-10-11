@@ -43,9 +43,10 @@ INSTALLED_APPS = [
     'courses.apps.CoursesConfig',
     'assignments.apps.AssignmentsConfig',
     
-    # extras
+    # libraries
     'crispy_forms',
     'nested_admin',
+    'import_export',
 ]
 
 # use our custom user model

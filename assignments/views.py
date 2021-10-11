@@ -8,6 +8,8 @@ from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 from assignments.models import Assignment, Question
 from courses.models import Course
 
+from django import forms
+
 
 class AssignmentView(DetailView):
     model = Assignment
@@ -43,6 +45,11 @@ class PublishAssignment(UpdateView):
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
     success_url = "/"
+
+    def clean(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        if assignment.questions.get_values().len() == 0:
+            raise forms.ValidationError("No questions in assignment")
 
 
 class CreateQuestion(CreateView):
