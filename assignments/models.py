@@ -2,9 +2,10 @@ import pytz
 from autoslug import AutoSlugField
 from datetime import datetime, timedelta
 
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 import courses
+import peerGrader
 
 utc = pytz.UTC
 
@@ -35,3 +36,16 @@ class Question(models.Model):
     point_value = models.IntegerField(validators=[MinValueValidator(0)])
     assignment = models.ForeignKey('Assignment', related_name='questions', on_delete=models.CASCADE, )
     index = models.IntegerField(validators=[MinValueValidator(1)])
+
+
+class AssignmentSubmission(models.Model):
+    student = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL, related_name='submissions', on_delete=models.CASCADE, )
+    assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
+    score = models.IntegerField(validators=[MinValueValidator(0), ], )
+
+
+class QuestionSubmission(models.Model):
+    answer_body = models.TextField()
+    AssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='question_submissions', on_delete=models.CASCADE, )
+    question = models.ForeignKey('Question', related_name='question_submissions', on_delete=models.CASCADE, )
+    points = models.IntegerField(validators=[MinValueValidator(0), ],)

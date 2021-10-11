@@ -8,8 +8,9 @@
         <hr>
         <div class="d-flex justify-content-between align-items-center">
             <p>Due: {{ assignment.due_date }}</p>
-            <a href="{% url 'assignments:create_question' assignment.slug %}" class="btn btn-outline-primary">Add
-                Question</a>
+            {%  if request.user.is_instructor %}
+                <a href="{% url 'assignments:create_question' assignment.slug %}" class="btn btn-outline-primary">Add Question</a>
+            {% endif %}
         </div>
     </div>
     {% if assignment.questions.all %}
@@ -23,8 +24,10 @@
                         {#                        {% if user.is_authenticated and user.is_instructor %}#}
                         {#                            <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>#}
                         {#                        {% endif %}#}
-                        <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
-                        <a href="{% url 'assignments:delete_question' assignment.slug Question.index %}" class="btn btn-danger">Delete</a>
+                        {%  if request.user.is_instructor %}
+                            <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
+                            <a href="{% url 'assignments:delete_question' assignment.slug Question.index %}" class="btn btn-danger">Delete</a>
+                        {%  endif %}
 {#                        <a href="#" class="btn btn-primary">View</a>#}
                     </div>
                 </div>
