@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="d-inline">Course: {{ course.name }}</h1>
+            <a class="btn btn-primary" href="{% url 'home' %}">← Back</a>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Instructor: {{ course.instructor.username }}</h3>
+            <a class="btn btn-outline-primary" href="{% url 'assignments:create_assignment' course.slug %}">Create
+                Assignment</a>
+        </div>
+    </div>
+    {% if assignments %}
+        {% for Assignment in assignments %}
+            <div class="card mt-3 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="d-inline">{{ Assignment.name }}</h2>
+                    </div>
+                    <div>
+                        {% if assignment.is_published %}
+                            <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
+                               class="btn btn-outline-warn">Unpublish Assignment</a>
+                        {% else %}
+                            <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
+                               class="btn btn-outline-success">Publish Assignment</a>
+                        {% endif %}
+                        <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>
+                        <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
+                           class="btn btn-primary">View</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if assignments.has_other_pages %}
+            <ul class="mt-3 pagination justify-content-center">
+                {% if assignments.has_previous %}
+                    <li><a class="page-link" href="?page={{ assignments.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="disabled page-item"><a class="page-link" href="#">&laquo;</a></li>
+                {% endif %}
+                {% for i in assignments.paginator.page_range %}
+                    {% if users.number == i %}
+                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                        <li><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if assignments.has_next %}
+                    <li><a class="page-link" href="?page={{ assignments.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="disabled page-item"><a class="page-link" href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
+    {% else %}
+        <h3>There are no assignments.</h3>
+    {% endif %}
+{% endblock content %}
