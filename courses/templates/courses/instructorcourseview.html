@@ -24,7 +24,9 @@
                                class="btn btn-outline-warn">Unpublish Assignment</a>
                         {% else %}
                             <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
-                               class="btn btn-outline-success">Publish Assignment</a>
+                               class="btn btn-outline-success">Publish</a>
+                            <a href="{% url 'assignments:edit_assignment' Assignment.slug %}"
+                               class="btn btn-outline-primary">Edit</a>
                         {% endif %}
                         <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>
                         <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
