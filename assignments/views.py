@@ -67,6 +67,15 @@ class DeleteAssignment(DeleteView):
             return super(DeleteAssignment, self).dispatch(request, *args, **kwargs)
 
 
+class EditAssignment(UpdateView):
+    model = Assignment
+    slug_url_kwarg = 'slug' #use slug to get specific assignment
+    slug_field = 'slug'
+    success_url = "/" #sending to home page
+    template_name = 'assignments/editassignment.html'
+    fields = ('name', 'due_date',) #specifying what variables in the model need to be modified
+
+
 class PublishAssignment(UpdateView):
     model = Assignment
     template_name = 'assignments/publish_assignment.html'
@@ -182,6 +191,7 @@ assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
 assignment_publish_view = login_required(PublishAssignment.as_view())
+assignment_edit_view = login_required(EditAssignment.as_view())
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())

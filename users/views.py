@@ -20,7 +20,7 @@ class EditUsername(UpdateView):
     template_name = 'registration/changeusername.html'
     fields = ('username',)
 
-    def get_object(self):
+    def get_object(self): #override how to look for object, user has no slug so have to use get_object
         return self.request.user
 
 def home_view(request):
