@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 
-from assignments.models import Assignment, Question
+from assignments.models import Assignment, Question, AssignmentSubmission
 from courses.models import Course
 
 from django import forms
@@ -104,7 +104,7 @@ class CreateQuestion(CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         # validate user
-        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
         course = assignment.course
         user = request.user
         if not (course.instructor == user):
@@ -126,7 +126,7 @@ class EditQuestion(UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         # validate user
-        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
         course = assignment.course
         user = request.user
         if not (course.instructor == user):
@@ -142,9 +142,13 @@ class DeleteQuestion(DeleteView):
     success_url = "/"
     template_name = 'questions/deletequestion.html'
 
+    def get_queryset(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
+
     def dispatch(self, request, *args, **kwargs):
         # validate user
-        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
         course = assignment.course
         user = request.user
         if not (course.instructor == user):
@@ -152,15 +156,35 @@ class DeleteQuestion(DeleteView):
         else:
             return super(DeleteQuestion, self).dispatch(request, *args, **kwargs)
 
-    def get_queryset(self):
-        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-        return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
+
+class CreateSubmission(CreateView):
+    model = AssignmentSubmission
+    template_name = 'submissions/create_submission.html'
+    fields = ('is_submitted',)
+
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        form.instance.assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        return super(CreateSubmission, self).form_valid(form)
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     # validate user
+    #     course = Course.objects.get(slug=self.kwargs['course_slug'])
+    #     user = request.user
+    #     if not (course.instructor == user):
+    #         return redirect('/')
+    #     else:
+    #         return super(CreateSubmission, self).dispatch(request, *args, **kwargs)
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
 assignment_publish_view = login_required(PublishAssignment.as_view())
+
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
+
+submission_create_view = login_required(CreateSubmission.as_view())

@@ -10,6 +10,8 @@
             <p>Due: {{ assignment.due_date }}</p>
             {%  if request.user.is_instructor %}
                 <a href="{% url 'assignments:create_question' assignment.slug %}" class="btn btn-outline-primary">Add Question</a>
+            {% else %}
+                <a href="{% url 'assignments:create_submission' assignment.slug %}" class="btn btn-outline-primary">Start Submission</a>
             {% endif %}
         </div>
     </div>
@@ -21,7 +23,7 @@
                         <h2 class="d-inline">{{ Question.question_body }}</h2>
                     </div>
                     <div>
-                        {%  if request.user.is_instructor %}
+                        {%  if request.user.is_instructor and not Question.is_published %}
                             <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
                             <a href="{% url 'assignments:delete_question' assignment.slug Question.index %}" class="btn btn-danger">Delete</a>
                         {%  endif %}

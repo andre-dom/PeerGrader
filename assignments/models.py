@@ -40,9 +40,13 @@ class Question(models.Model):
 
 
 class AssignmentSubmission(models.Model):
-    student = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL, related_name='submissions', on_delete=models.CASCADE, )
+    student = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL,
+                                related_name='submissions',
+                                on_delete=models.CASCADE,
+                                limit_choices_to={'is_instructor': False},)
     assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
     score = models.IntegerField(validators=[MinValueValidator(0), ], )
+    is_submitted = models.BooleanField(default=False)
 
 
 class QuestionSubmission(models.Model):
