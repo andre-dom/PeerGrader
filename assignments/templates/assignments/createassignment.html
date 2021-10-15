@@ -4,8 +4,9 @@
 {% block content %}
     <h2>Create an assignment</h2>
     <form method="post">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button type="submit" class="btn btn-primary mt-3">Create Assignment</button>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary mt-3">Create Assignment</button>
+        <button type="submit" value="Confirm" class="btn btn-danger mt-3">Cancel</button>
     </form>
 {% endblock %}

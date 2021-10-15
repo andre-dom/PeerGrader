@@ -2,10 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2>Publish Question</h2>
+    <h2>Publish Assignment</h2>
     <form method="post">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <button type="submit" value="Confirm" class="btn btn-danger mt-3">Do not publish</button>
     </form>
 {% endblock %}
