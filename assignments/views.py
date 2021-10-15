@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse_lazy
@@ -17,6 +17,16 @@ class AssignmentView(DetailView):
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
 
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user or (user in course.students.all())):
+            return redirect('/')
+        else:
+            return super(AssignmentView, self).dispatch(request, *args, **kwargs)
+
 
 class CreateAssignment(CreateView):
     model = Assignment
@@ -29,6 +39,15 @@ class CreateAssignment(CreateView):
         form.instance.course = Course.objects.get(slug=self.kwargs['course_slug'])
         return super(CreateAssignment, self).form_valid(form)
 
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        course = Course.objects.get(slug=self.kwargs['course_slug'])
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(CreateAssignment, self).dispatch(request, *args, **kwargs)
+
 
 class DeleteAssignment(DeleteView):
     model = Assignment
@@ -36,6 +55,16 @@ class DeleteAssignment(DeleteView):
     slug_field = 'slug'
     success_url = "/"
     template_name = 'assignments/deleteassignment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(DeleteAssignment, self).dispatch(request, *args, **kwargs)
 
 
 class PublishAssignment(UpdateView):
@@ -51,6 +80,16 @@ class PublishAssignment(UpdateView):
         if assignment.questions.get_values().len() == 0:
             raise forms.ValidationError("No questions in assignment")
 
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(PublishAssignment, self).dispatch(request, *args, **kwargs)
+
 
 class CreateQuestion(CreateView):
     model = Question
@@ -63,6 +102,15 @@ class CreateQuestion(CreateView):
         form.instance.index = Assignment.objects.get(slug=self.kwargs['assignment_slug']).numQuestions() + 1
         return super(CreateQuestion, self).form_valid(form)
 
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(CreateQuestion, self).dispatch(request, *args, **kwargs)
 
 class EditQuestion(UpdateView):
     model = Question
@@ -76,6 +124,16 @@ class EditQuestion(UpdateView):
         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
         return Question.objects.filter(assignment=assignment, index=self.kwargs['index'])
 
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(EditQuestion, self).dispatch(request, *args, **kwargs)
+
 
 class DeleteQuestion(DeleteView):
     model = Question
@@ -83,6 +141,16 @@ class DeleteQuestion(DeleteView):
     slug_field = 'index'
     success_url = "/"
     template_name = 'questions/deletequestion.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(DeleteQuestion, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
