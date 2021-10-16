@@ -16,7 +16,7 @@
             <div class="card mt-3 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="d-inline">{{ Question.question_body }}</h2>
+                        <h2 class="d-inline">{{ Question.index }}. {{ Question.question_body }} ({{ Question.point_value }} point{{ Question.point_value|pluralize }})</h2>
                     </div>
                     <div>
                         <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>

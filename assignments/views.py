@@ -10,7 +10,6 @@ from courses.models import Course
 
 class AssignmentView(DetailView):
     model = Assignment
-    # template_name = 'assignments/assignmentview.html'
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
 
@@ -217,6 +216,28 @@ class EditQuestionSubmission(UpdateView):
             return super(EditQuestionSubmission, self).dispatch(request, *args, **kwargs)
 
 
+class SubmitSubmission(UpdateView):
+    model = AssignmentSubmission
+    template_name = 'submissions/submit_submission.html'
+    fields = ('is_submitted',)
+    success_url = "/"
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        assignment_submission = AssignmentSubmission.objects.get(assignment=assignment, student=self.request.user)
+        return assignment_submission
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(SubmitSubmission, self).dispatch(request, *args, **kwargs)
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -228,3 +249,4 @@ question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
 
 question_submission_edit_view = login_required(EditQuestionSubmission.as_view())
+submit_submission_view = login_required(SubmitSubmission.as_view())

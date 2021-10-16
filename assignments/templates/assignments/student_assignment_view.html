@@ -8,6 +8,7 @@
         <hr>
         <div class="d-flex justify-content-between align-items-center">
             <p>Due: {{ assignment.due_date }}</p>
+            <a href="{% url 'assignments:submit_submission' assignment.slug %}" class="btn btn-outline-primary">Submit</a>
         </div>
     </div>
     {% if assignment.questions.all %}
@@ -15,7 +16,7 @@
             <div class="card mt-3 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="d-inline">{{ question_submission.question.question_body }}</h2>
+                        <h2 class="d-inline">{{ question_submission.question.index }}. {{ question_submission.question.question_body }} ({{ question_submission.question.point_value }} point{{ question_submission.question.point_value|pluralize }})</h2>
                     </div>
                     <div>
                         <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}" class="btn btn-outline-primary">Edit Answer</a>
