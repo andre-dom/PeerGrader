@@ -1,18 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import inlineformset_factory
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect
 
-# Create your views here.
 from django.urls import reverse_lazy
-from django.views import View
 from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 
-from assignments.forms import QuestionSubmissionFormSet, QuestionSubmissionForm
 from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission
 from courses.models import Course
-
-from django import forms
 
 
 class AssignmentView(DetailView):
@@ -27,14 +20,14 @@ class AssignmentView(DetailView):
         else:
             return 'assignments/student_assignment_view.html'
 
+    # if student, pass assignment submission to context so they can preview their answers
     def get_context_data(self, **kwargs):
         context = super(AssignmentView, self).get_context_data(**kwargs)
         user = self.request.user
-        if not user:
-            assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
-            question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission,
-                                                                 question=self)
-            context["question_submission"] = "question_submission"
+        if not user.is_instructor:
+            assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+            assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=assignment)
+            context.update({"assignment_submission": assignment_submission})
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -199,82 +192,6 @@ class DeleteQuestion(DeleteView):
             return super(DeleteQuestion, self).dispatch(request, *args, **kwargs)
 
 
-# def edit_submission(request, assignment_slug):
-#     # exercisename = ExerciseName.objects.get(pk=exercisegroup_id)
-#     # SetLoggerFormSet = inlineformset_factory(ExerciseName, SetLogger, fields=('weight','reps',))
-#
-#     assignment = Assignment.objects.get(slug=assignment_slug)
-#     assignment_submission = AssignmentSubmission.objects.filter(assignment=assignment, student=request.user).first()
-#
-#     if request.method == 'POST':
-#         formset = QuestionSubmissionFormSet(instance=assignment_submission)
-#         if formset.is_valid():
-#             formset.save()
-#             return redirect('assignment_view', slug=assignment_slug)
-#     else:
-#         formset = QuestionSubmissionFormSet(instance=assignment_submission)
-#     print(formset)
-#     return render(request, 'submissions/edit_submission.html', {
-#         'assignment_submission': assignment_submission,
-#         'formset': formset})
-
-
-# class EditSubmission(UpdateView):
-#     model = AssignmentSubmission
-#     template_name = 'submissions/edit_submission.html'
-#     fields = ('is_submitted',)
-#
-#     success_url = reverse_lazy('home')
-#
-#
-#     def get_object(self):
-#         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-#         return AssignmentSubmission.objects.filter(assignment=assignment, student=self.request.user).first()
-#
-#     def get_context_data(self, **kwargs):
-#         data = super(ProfileFamilyMemberCreate, self).get_context_data(**kwargs)
-#         if self.request.POST:
-#             data['familymembers'] = FamilyMemberFormSet(self.request.POST)
-#         else:
-#             data['familymembers'] = FamilyMemberFormSet()
-#         return data
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         # validate user
-#         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-#         course = assignment.course
-#         user = self.request.user
-#         if not (user not in course.students.all()):
-#             return redirect('/')
-#         return super(EditSubmission, self).dispatch(request, *args, **kwargs)
-
-# class EditSubmission(UpdateView):
-#     model = QuestionSubmission
-#     template_name = 'submissions/edit_submission.html'
-#     success_url = reverse_lazy('home')
-#
-#     formset = QuestionSubmissionFormSet
-#
-#     if request.method == 'POST':
-#         formset = SetLoggerFormSet(request.POST, instance=exercisename)
-#         if formset.is_valid():
-#             formset.save()
-#         else:
-#             formset = SetLoggerFormSet(instance=exercisename)
-#
-#     def get_object(self):
-#         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-#         return AssignmentSubmission.objects.filter(assignment=assignment, student=self.request.user).first()
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         # validate user
-#         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-#         course = assignment.course
-#         user = self.request.user
-#         if not (user not in course.students.all()):
-#             return redirect('/')
-#         return super(EditSubmission, self).dispatch(request, *args, **kwargs)
-
 class EditQuestionSubmission(UpdateView):
     model = QuestionSubmission
     template_name = 'submissions/edit_question_submission.html'
@@ -283,17 +200,21 @@ class EditQuestionSubmission(UpdateView):
 
     def get_object(self):
         assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-        return AssignmentSubmission.objects.get(assignment=assignment, student=self.request.user)
+        assignment_submission = AssignmentSubmission.objects.get(assignment=assignment, student=self.request.user)
+        question = Question.objects.get(assignment=assignment, index=self.kwargs['index'])
+        question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission,
+                                                             question=question)
+        return question_submission
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     # validate user
-    #     assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-    #     course = assignment.course
-    #     user = request.user
-    #     if user not in course.students.all():
-    #         return redirect('/')
-    #     else:
-    #         return super(EditQuestionSubmission, self).dispatch(request, *args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(EditQuestionSubmission, self).dispatch(request, *args, **kwargs)
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())
@@ -306,5 +227,4 @@ question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
 
-# submission_edit_view = login_required(EditSubmission.as_view())
 question_submission_edit_view = login_required(EditQuestionSubmission.as_view())

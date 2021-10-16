@@ -45,6 +45,7 @@ class Question(models.Model):
     point_value = models.IntegerField(validators=[MinValueValidator(0)])
     assignment = models.ForeignKey('Assignment', related_name='questions', on_delete=models.CASCADE, )
     index = models.IntegerField(validators=[MinValueValidator(1)])
+    # ordering = ['index']
 
     def getSubmissionByUser(self, user):
         assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
