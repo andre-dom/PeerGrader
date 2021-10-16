@@ -8,9 +8,7 @@
         <hr>
         <div class="d-flex justify-content-between align-items-center">
             <p>Due: {{ assignment.due_date }}</p>
-            {%  if request.user.is_instructor %}
-                <a href="{% url 'assignments:create_question' assignment.slug %}" class="btn btn-outline-primary">Add Question</a>
-            {% endif %}
+            <a href="{% url 'assignments:create_question' assignment.slug %}" class="btn btn-outline-primary">Add Question</a>
         </div>
     </div>
     {% if assignment.questions.all %}
@@ -21,19 +19,10 @@
                         <h2 class="d-inline">{{ Question.question_body }}</h2>
                     </div>
                     <div>
-                        {%  if request.user.is_instructor %}
-                            <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
-                            <a href="{% url 'assignments:delete_question' assignment.slug Question.index %}" class="btn btn-danger">Delete</a>
-                        {% else %}
-                            <a href="{% url 'assignments:edit_submission' assignment.slug %}" class="btn btn-outline-primary">Edit Answer</a>
-                        {%  endif %}
+                        <a href="{% url 'assignments:edit_question' assignment.slug Question.index %}" class="btn btn-outline-primary">Edit</a>
+                        <a href="{% url 'assignments:delete_question' assignment.slug Question.index %}" class="btn btn-danger">Delete</a>
                     </div>
                 </div>
-                {% if not request.user.is_instructor %}
-                    <div>
-                        <p>{{ Question.question_submissions.filter() }}</p>
-                    </div>
-                {% endif %}
             </div>
         {% endfor %}
 

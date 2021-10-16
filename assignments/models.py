@@ -46,6 +46,11 @@ class Question(models.Model):
     assignment = models.ForeignKey('Assignment', related_name='questions', on_delete=models.CASCADE, )
     index = models.IntegerField(validators=[MinValueValidator(1)])
 
+    def getSubmissionByUser(self, user):
+        assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
+        question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission, question=self)
+        return question_submission
+
 
 class AssignmentSubmission(models.Model):
     student = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL,

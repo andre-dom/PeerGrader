@@ -13,5 +13,5 @@ urlpatterns = [
     path('<slug:assignment_slug>/editquestion/<int:index>', assignments.views.question_edit_view, name='edit_question'),
     path('<slug:assignment_slug>/deletequestion/<int:index>', assignments.views.question_delete_view,
          name='delete_question'),
-    path('<slug:assignment_slug>/submission', assignments.views.submission_create_view, name='create_submission'),
+    path('<slug:assignment_slug>/submission', assignments.views.question_submission_edit_view, name='edit_submission'),
 ]
