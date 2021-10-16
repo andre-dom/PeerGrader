@@ -19,9 +19,9 @@
                         <h2 class="d-inline">{{ Assignment.name }}</h2>
                     </div>
                     <div>
-                        {% if assignment.is_published %}
+                        {% if Assignment.is_published %}
                             <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
-                               class="btn btn-outline-warn">Unpublish Assignment</a>
+                               class="btn btn-warning">Unpublish Assignment</a>
                         {% else %}
                             <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
                                class="btn btn-outline-success">Publish</a>

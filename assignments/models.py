@@ -31,6 +31,14 @@ class Assignment(models.Model):
             t += q.point_value
         return t
 
+    # def createSubmissions(self):
+    #     for student in self.course.students.values():
+    #         if not AssignmentSubmission.objects.filter(student=student, assignment=self):
+    #             assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=self)
+    #         for question in self.questions.values():
+    #             if not QuestionSubmission.objects.filter(AssignmentSubmission=assignment_submission, question=question):
+    #                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
+
 
 class Question(models.Model):
     question_body = models.TextField()
@@ -45,12 +53,15 @@ class AssignmentSubmission(models.Model):
                                 on_delete=models.CASCADE,
                                 limit_choices_to={'is_instructor': False},)
     assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
-    score = models.IntegerField(validators=[MinValueValidator(0), ], )
+    score = models.IntegerField(default=-1,)
     is_submitted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.assignment.course.name + ", " + self.assignment.name + ": " + self.student.username
 
 
 class QuestionSubmission(models.Model):
     answer_body = models.TextField()
     AssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='question_submissions', on_delete=models.CASCADE, )
     question = models.ForeignKey('Question', related_name='question_submissions', on_delete=models.CASCADE, )
-    points = models.IntegerField(validators=[MinValueValidator(0), ],)
+    points = models.IntegerField(default=-1,)

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 
-from assignments.models import Assignment, Question, AssignmentSubmission
+from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission
 from courses.models import Course
 
 from django import forms
@@ -69,11 +69,11 @@ class DeleteAssignment(DeleteView):
 
 class EditAssignment(UpdateView):
     model = Assignment
-    slug_url_kwarg = 'slug' #use slug to get specific assignment
+    slug_url_kwarg = 'slug'  # use slug to get specific assignment
     slug_field = 'slug'
-    success_url = "/" #sending to home page
+    success_url = "/"  # sending to home page
     template_name = 'assignments/editassignment.html'
-    fields = ('name', 'due_date',) #specifying what variables in the model need to be modified
+    fields = ('name', 'due_date',)  # specifying what variables in the model need to be modified
 
 
 class PublishAssignment(UpdateView):
@@ -84,10 +84,33 @@ class PublishAssignment(UpdateView):
     slug_field = 'slug'
     success_url = "/"
 
-    def clean(self):
-        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
-        if assignment.questions.get_values().len() == 0:
-            raise forms.ValidationError("No questions in assignment")
+    def form_valid(self, form):
+        # create/delete assignment submissions for every student when assignments are published/unpublished
+        if form.instance.is_published:
+            assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+            # assignment.createSubmissions()
+            for student in assignment.course.students.all():
+                if not AssignmentSubmission.objects.filter(student=student, assignment=assignment):
+                    assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=assignment)
+                for question in assignment.questions.all():
+                    if not QuestionSubmission.objects.filter(
+                            AssignmentSubmission=AssignmentSubmission.objects.create(student=student,
+                                                                                     assignment=assignment),
+                            question=question):
+                        QuestionSubmission.objects.create(
+                            AssignmentSubmission=AssignmentSubmission.objects.create(student=student,
+                                                                                     assignment=assignment),
+                            question=question)
+        else:
+            assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+            for submission in assignment.assignment_submissions.all():
+                submission.delete()
+        return super(PublishAssignment, self).form_valid(form)
+
+    # def clean(self):
+    #     assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+    #     if assignment.questions.get_values().len() == 0:
+    #         raise forms.ValidationError("No questions in assignment")
 
     def dispatch(self, request, *args, **kwargs):
         # validate user
@@ -120,6 +143,7 @@ class CreateQuestion(CreateView):
             return redirect('/')
         else:
             return super(CreateQuestion, self).dispatch(request, *args, **kwargs)
+
 
 class EditQuestion(UpdateView):
     model = Question
@@ -175,6 +199,7 @@ class CreateSubmission(CreateView):
 
     def form_valid(self, form):
         form.instance.assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        form.instance.student = self.request.user
         return super(CreateSubmission, self).form_valid(form)
 
     # def dispatch(self, request, *args, **kwargs):
