@@ -45,11 +45,15 @@ class CreateAssignment(CreateView):
     template_name = 'assignments/createassignment.html'
     fields = ('name', 'due_date',)
 
-    success_url = reverse_lazy('home')
-
     def form_valid(self, form):
         form.instance.course = Course.objects.get(slug=self.kwargs['course_slug'])
         return super(CreateAssignment, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateAssignment, self).get_context_data(**kwargs)
+        course = Course.objects.get(slug=self.kwargs['course_slug'])
+        context.update({"course": course})
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         # validate user
@@ -59,6 +63,9 @@ class CreateAssignment(CreateView):
             return redirect('/')
         else:
             return super(CreateAssignment, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('courses:view_course', kwargs={'slug': self.kwargs['course_slug']})
 
 
 class DeleteAssignment(DeleteView):
@@ -78,14 +85,21 @@ class DeleteAssignment(DeleteView):
         else:
             return super(DeleteAssignment, self).dispatch(request, *args, **kwargs)
 
+    def get_success_url(self, **kwargs):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
+
 
 class EditAssignment(UpdateView):
     model = Assignment
     slug_url_kwarg = 'slug'  # use slug to get specific assignment
     slug_field = 'slug'
-    success_url = "/"  # sending to home page
     template_name = 'assignments/editassignment.html'
     fields = ('name', 'due_date',)  # specifying what variables in the model need to be modified
+
+    def get_success_url(self, **kwargs):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
 
 
 class PublishAssignment(UpdateView):
@@ -94,7 +108,6 @@ class PublishAssignment(UpdateView):
     fields = ('is_published',)
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
-    success_url = "/"
 
     def form_valid(self, form):
         # create/delete assignment submissions for every student when assignments are published/unpublished
@@ -123,6 +136,10 @@ class PublishAssignment(UpdateView):
         else:
             return super(PublishAssignment, self).dispatch(request, *args, **kwargs)
 
+    def get_success_url(self, **kwargs):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
+
 
 class CreateQuestion(CreateView):
     model = Question
@@ -144,6 +161,15 @@ class CreateQuestion(CreateView):
             return redirect('/')
         else:
             return super(CreateQuestion, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateQuestion, self).get_context_data(**kwargs)
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        context.update({"assignment": assignment})
+        return context
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
 class EditQuestion(UpdateView):
@@ -168,6 +194,9 @@ class EditQuestion(UpdateView):
         else:
             return super(EditQuestion, self).dispatch(request, *args, **kwargs)
 
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+
 
 class DeleteQuestion(DeleteView):
     model = Question
@@ -189,6 +218,9 @@ class DeleteQuestion(DeleteView):
             return redirect('/')
         else:
             return super(DeleteQuestion, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
 class EditQuestionSubmission(UpdateView):
@@ -215,6 +247,9 @@ class EditQuestionSubmission(UpdateView):
         else:
             return super(EditQuestionSubmission, self).dispatch(request, *args, **kwargs)
 
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+
 
 class SubmitSubmission(UpdateView):
     model = AssignmentSubmission
@@ -236,6 +271,9 @@ class SubmitSubmission(UpdateView):
             return redirect('/')
         else:
             return super(SubmitSubmission, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())

@@ -7,6 +7,6 @@
         {% csrf_token %}
         <p>Are you sure you want to delete "{{ object }}"?</p>
         <button type="submit" value="Confirm" class="btn btn-danger mt-3">Delete Question</button>
-        <a class="btn btn-outline-secondary mt-3" href="{% url 'home' %}">No, don't delete</a>
+        <a class="btn btn-outline-secondary mt-3" href="{%  url 'assignments:view_assignment' object.assignment.slug %}">Cancel</a>
     </form>
 {% endblock %}
