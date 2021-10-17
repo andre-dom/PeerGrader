@@ -16,7 +16,11 @@ def course_view(request, slug):
     if not (course.instructor == user or (user in course.students.all())):
         return redirect('/')
 
-    assignment_list = course.assignments.values()
+    # dont show unpublished assignments to students
+    if user.is_instructor:
+        assignment_list = course.assignments.all().order_by('slug')
+    else:
+        assignment_list = course.assignments.filter(is_published=True).order_by('slug')
 
     page = request.GET.get('page', 1)
     paginator = Paginator(assignment_list, 5)

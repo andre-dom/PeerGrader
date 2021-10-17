@@ -59,6 +59,6 @@
         {% endif %}
 
     {% else %}
-        <h3>There are no assignments.</h3>
+        <h5 class="mt-5">There are no assignments. Would you like to <a href="{% url 'assignments:create_assignment' course.slug %}">create one?</a></h5>
     {% endif %}
 {% endblock content %}
