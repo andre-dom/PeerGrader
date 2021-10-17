@@ -23,11 +23,11 @@ class Assignment(models.Model):
         return self.name
 
     def numQuestions(self):
-        return len(self.questions.values())
+        return len(self.questions.all())
 
     def pointTotal(self):
         t = 0
-        for q in self.questions:
+        for q in self.questions.all():
             t += q.point_value
         return t
 
@@ -47,10 +47,10 @@ class Question(models.Model):
     index = models.IntegerField(validators=[MinValueValidator(1)])
     # ordering = ['index']
 
-    def getSubmissionByUser(self, user):
-        assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
-        question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission, question=self)
-        return question_submission
+    # def getSubmissionByUser(self, user):
+    #     assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
+    #     question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission, question=self)
+    #     return question_submission
 
 
 class AssignmentSubmission(models.Model):
