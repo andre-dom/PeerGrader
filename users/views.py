@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -29,7 +29,7 @@ def home_view(request):
         return render(request, 'landing.html')
 
     if request.user.is_instructor:
-        instructor_courses_list = Course.objects.filter(instructor=request.user)
+        instructor_courses_list = Course.objects.filter(instructor=request.user).order_by('slug')
 
         page = request.GET.get('page', 1)
         paginator = Paginator(instructor_courses_list, 5)
@@ -42,7 +42,7 @@ def home_view(request):
 
         return render(request, 'users/instructorhome.html', {'instructor_courses': instructor_courses, })
 
-    student_courses_list = Course.objects.filter(students=request.user)
+    student_courses_list = Course.objects.filter(students=request.user).order_by('slug')
     page = request.GET.get('page', 1)
     paginator = Paginator(student_courses_list, 5)
     try:
