@@ -2,11 +2,23 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2>Publish Assignment</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" class="btn btn-primary mt-3">Submit</button>
-        <a class="btn btn-outline-secondary mt-3" href="{%  url 'courses:view_course' object.course.slug %}">Cancel</a>
-    </form>
+    {% if not assignment.is_published %}
+        <h2>Are you sure you want to publish {{ assignment.name }}?</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary mt-3">Publish Assignment</button>
+            <a class="btn btn-outline-secondary mt-3"
+               href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
+        </form>
+    {% else %}
+        <h2>Are you sure you want to unpublish {{ assignment.name }}?</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-warning mt-3">Unpublish Assignment</button>
+            <a class="btn btn-outline-secondary mt-3"
+               href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
+        </form>
+    {% endif %}
 {% endblock %}
