@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    {% if not assignment.is_published %}
+    {% if assignment.state == "unpublished" %}
         <h2>Are you sure you want to publish {{ assignment.name }}?</h2>
         <form method="post">
             {% csrf_token %}

@@ -18,9 +18,11 @@
                     <div>
                         <h2 class="d-inline">{{ question_submission.question.index }}. {{ question_submission.question.question_body }} ({{ question_submission.question.point_value }} point{{ question_submission.question.point_value|pluralize }})</h2>
                     </div>
-                    <div>
-                        <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}" class="btn btn-outline-primary">Edit Answer</a>
-                    </div>
+                    {% if assignment.state == 'unpublished' %}
+                        <div>
+                            <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}" class="btn btn-outline-primary">Edit Answer</a>
+                        </div>
+                    {% endif %}
                 </div>
                 <hr>
                 <div>

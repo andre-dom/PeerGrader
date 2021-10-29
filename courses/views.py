@@ -20,7 +20,7 @@ def course_view(request, slug):
     if user.is_instructor:
         assignment_list = course.assignments.all().order_by('slug')
     else:
-        assignment_list = course.assignments.filter(is_published=True).order_by('slug')
+        assignment_list = course.assignments.filter(state="published").order_by('slug')
 
     page = request.GET.get('page', 1)
     paginator = Paginator(assignment_list, 5)

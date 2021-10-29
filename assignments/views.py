@@ -110,8 +110,7 @@ class PublishAssignment(UpdateView):
     slug_field = 'slug'
 
     def form_valid(self, form):
-        form.instance.is_published = not form.instance.is_published
-        if form.instance.is_published:
+        if not form.instance.state == 'published':
             form.instance.to_state_published()
         else:
             form.instance.to_state_unpublished()

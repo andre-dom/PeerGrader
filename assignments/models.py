@@ -18,7 +18,6 @@ class Assignment(models.Model):
                                     validators=[MinValueValidator(limit_value=utc.localize(datetime.now()))])
     course = models.ForeignKey('courses.Course', related_name='assignments', on_delete=models.CASCADE, )
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
-    is_published = models.BooleanField(default=False)
     state = FSMField(default="unpublished", protected=True)
 
     @transition(field=state, source="unpublished", target="published")
