@@ -105,21 +105,29 @@ class EditAssignment(UpdateView):
 class PublishAssignment(UpdateView):
     model = Assignment
     template_name = 'assignments/publish_assignment.html'
-    fields = ('is_published',)
+    fields = ()
     slug_url_kwarg = 'slug'
     slug_field = 'slug'
 
     def form_valid(self, form):
-        # create/delete assignment submissions for every student when assignments are published/unpublished
-        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        form.instance.is_published = not form.instance.is_published
         if form.instance.is_published:
-            for student in assignment.course.students.all():
-                assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=assignment)
-                for question in assignment.questions.all():
-                    QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
+            form.instance.to_state_published()
         else:
-            assignment.assignment_submissions.all().delete()
+            form.instance.to_state_unpublished()
         return super(PublishAssignment, self).form_valid(form)
+
+    # def form_valid(self, form):
+    #     # create/delete assignment submissions for every student when assignments are published/unpublished
+    #     assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+    #     if form.instance.is_published:
+    #         for student in assignment.course.students.all():
+    #             assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=assignment)
+    #             for question in assignment.questions.all():
+    #                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
+    #     else:
+    #         assignment.assignment_submissions.all().delete()
+    #     return super(PublishAssignment, self).form_valid(form)
 
     # def clean(self):
     #     assignment = Assignment.objects.get(slug=self.kwargs['slug'])

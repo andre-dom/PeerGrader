@@ -15,16 +15,13 @@
                 {% if user.is_authenticated %}
                     {% if user.is_instructor %}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Instructor: {{  user.username }}</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'users:change_username' %}">Instructor: {{  user.username }}</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Student: {{  user.username }}</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'users:change_username' %}">Student: {{  user.username }}</a>
                         </li>
                     {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url 'users:change_username' %}">Change Username</a>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Logout</a>
                 </li>

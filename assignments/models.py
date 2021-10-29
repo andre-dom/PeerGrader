@@ -1,6 +1,7 @@
 import pytz
 from autoslug import AutoSlugField
 from datetime import datetime, timedelta
+from django_fsm import FSMField, transition
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -18,6 +19,20 @@ class Assignment(models.Model):
     course = models.ForeignKey('courses.Course', related_name='assignments', on_delete=models.CASCADE, )
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
     is_published = models.BooleanField(default=False)
+    state = FSMField(default="unpublished", protected=True)
+
+    @transition(field=state, source="unpublished", target="published")
+    def to_state_published(self):
+        # create assignment submissions for every student when assignment is published
+        for student in self.course.students.all():
+            assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=self)
+            for question in self.questions.all():
+                QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
+
+    @transition(field=state, source="published", target="unpublished")
+    def to_state_unpublished(self):
+        # delete all associated assignment submissions when assignment is unpublished
+        self.assignment_submissions.all().delete()
 
     def __str__(self):
         return self.name
@@ -30,14 +45,6 @@ class Assignment(models.Model):
         for q in self.questions.all():
             t += q.point_value
         return t
-
-    # def createSubmissions(self):
-    #     for student in self.course.students.values():
-    #         if not AssignmentSubmission.objects.filter(student=student, assignment=self):
-    #             assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=self)
-    #         for question in self.questions.values():
-    #             if not QuestionSubmission.objects.filter(AssignmentSubmission=assignment_submission, question=question):
-    #                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
 
 
 class Question(models.Model):
@@ -57,9 +64,9 @@ class AssignmentSubmission(models.Model):
     student = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL,
                                 related_name='submissions',
                                 on_delete=models.CASCADE,
-                                limit_choices_to={'is_instructor': False},)
+                                limit_choices_to={'is_instructor': False}, )
     assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
-    score = models.IntegerField(default=-1,)
+    score = models.IntegerField(default=-1, )
     is_submitted = models.BooleanField(default=False)
 
     def __str__(self):
@@ -68,6 +75,7 @@ class AssignmentSubmission(models.Model):
 
 class QuestionSubmission(models.Model):
     answer_body = models.TextField()
-    AssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='question_submissions', on_delete=models.CASCADE, )
+    AssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='question_submissions',
+                                             on_delete=models.CASCADE, )
     question = models.ForeignKey('Question', related_name='question_submissions', on_delete=models.CASCADE, )
-    points = models.IntegerField(default=-1,)
+    points = models.IntegerField(default=-1, )
