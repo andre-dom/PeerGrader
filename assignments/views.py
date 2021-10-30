@@ -111,27 +111,11 @@ class PublishAssignment(UpdateView):
 
     def form_valid(self, form):
         if not form.instance.state == 'published':
-            form.instance.to_state_published()
+            if form.instance.can_publish():
+                form.instance.to_state_published()
         else:
             form.instance.to_state_unpublished()
         return super(PublishAssignment, self).form_valid(form)
-
-    # def form_valid(self, form):
-    #     # create/delete assignment submissions for every student when assignments are published/unpublished
-    #     assignment = Assignment.objects.get(slug=self.kwargs['slug'])
-    #     if form.instance.is_published:
-    #         for student in assignment.course.students.all():
-    #             assignment_submission = AssignmentSubmission.objects.create(student=student, assignment=assignment)
-    #             for question in assignment.questions.all():
-    #                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
-    #     else:
-    #         assignment.assignment_submissions.all().delete()
-    #     return super(PublishAssignment, self).form_valid(form)
-
-    # def clean(self):
-    #     assignment = Assignment.objects.get(slug=self.kwargs['slug'])
-    #     if assignment.questions.get_values().len() == 0:
-    #         raise forms.ValidationError("No questions in assignment")
 
     def dispatch(self, request, *args, **kwargs):
         # validate user

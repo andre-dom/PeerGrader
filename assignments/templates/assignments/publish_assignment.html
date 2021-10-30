@@ -3,14 +3,24 @@
 
 {% block content %}
     {% if assignment.state == "unpublished" %}
-        <h2>Are you sure you want to publish {{ assignment.name }}?</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-primary mt-3">Publish Assignment</button>
-            <a class="btn btn-outline-secondary mt-3"
-               href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
-        </form>
+        {% if assignment.can_publish %}
+            <h2>Are you sure you want to publish {{ assignment.name }}?</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-3">Publish Assignment</button>
+                <a class="btn btn-outline-secondary mt-3"
+                   href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
+            </form>
+        {% else %}
+            <h2>Assignments must have:</h2>
+            <ul>
+                <li>At least 1 question</li>
+                <li>A due date in the future</li>
+            </ul>
+            <a class="btn btn-outline-primary mt-3"
+               href="{% url 'courses:view_course' object.course.slug %}">← Back</a>
+        {% endif %}
     {% else %}
         <h2>Are you sure you want to unpublish {{ assignment.name }}?</h2>
         <form method="post">

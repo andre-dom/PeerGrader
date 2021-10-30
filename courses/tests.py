@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from assignments.models import Assignment
+from assignments.models import Assignment, Question
 from courses.models import Course
 from users.models import AppUser
 
@@ -20,12 +20,15 @@ class CourseViewTests(TestCase):
         self.course1.save()
 
         self.assignment1 = Assignment.objects.create(name="Assignment 1", course=self.course1)
+        Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment1)
         self.assignment1.to_state_published()
         self.assignment1.save()
         self.assignment2 = Assignment.objects.create(name="Assignment 2", course=self.course1)
+        Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment2)
         self.assignment2.to_state_published()
         self.assignment2.save()
         self.assignment3 = Assignment.objects.create(name="Assignment 3", course=self.course1)
+        Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment3)
         self.assignment3.to_state_published()
         self.assignment3.save()
 
@@ -39,6 +42,7 @@ class CourseViewTests(TestCase):
 
         self.assignment4 = Assignment.objects.create(name="Assignment 4", course=self.course3)
         self.assignment5 = Assignment.objects.create(name="Assignment 5", course=self.course3)
+        Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment5)
         self.assignment5.to_state_published()
         self.assignment5.save()
         self.assignment6 = Assignment.objects.create(name="Assignment 6", course=self.course3)

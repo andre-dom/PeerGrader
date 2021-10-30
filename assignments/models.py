@@ -20,7 +20,18 @@ class Assignment(models.Model):
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
     state = FSMField(default="unpublished", protected=True)
 
-    @transition(field=state, source="unpublished", target="published")
+    def can_publish(self):
+        if self.numQuestions() > 0 and self.due_date > utc.localize(datetime.now()):
+            return True
+        return False
+
+    # publish assignment
+    # preconditions:
+    # assignment must have at least 1 question
+    # class must have at least 1 student
+    # postconditions:
+    # assignment_submission and question_submission models will be created for every student in the class
+    @transition(field=state, source="unpublished", target="published", conditions=[can_publish])
     def to_state_published(self):
         # create assignment submissions for every student when assignment is published
         for student in self.course.students.all():
@@ -28,7 +39,10 @@ class Assignment(models.Model):
             for question in self.questions.all():
                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
 
-    @transition(field=state, source="published", target="unpublished")
+    def can_unpublish(self):
+        return True
+
+    @transition(field=state, source="published", target="unpublished", conditions=[can_unpublish])
     def to_state_unpublished(self):
         # delete all associated assignment submissions when assignment is unpublished
         self.assignment_submissions.all().delete()
