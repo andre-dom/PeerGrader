@@ -19,9 +19,15 @@ class CourseViewTests(TestCase):
         self.course1.students.add(student)
         self.course1.save()
 
-        self.assignment1 = Assignment.objects.create(name="Assignment 1", course=self.course1, is_published=True)
-        self.assignment2 = Assignment.objects.create(name="Assignment 2", course=self.course1, is_published=True)
-        self.assignment3 = Assignment.objects.create(name="Assignment 3", course=self.course1, is_published=True)
+        self.assignment1 = Assignment.objects.create(name="Assignment 1", course=self.course1)
+        self.assignment1.to_state_published()
+        self.assignment1.save()
+        self.assignment2 = Assignment.objects.create(name="Assignment 2", course=self.course1)
+        self.assignment2.to_state_published()
+        self.assignment2.save()
+        self.assignment3 = Assignment.objects.create(name="Assignment 3", course=self.course1)
+        self.assignment3.to_state_published()
+        self.assignment3.save()
 
         self.course2 = Course.objects.create(name="CS 102", instructor=instructor)
         self.course2.students.add(student)
@@ -32,7 +38,9 @@ class CourseViewTests(TestCase):
         self.course3.save()
 
         self.assignment4 = Assignment.objects.create(name="Assignment 4", course=self.course3)
-        self.assignment5 = Assignment.objects.create(name="Assignment 5", course=self.course3, is_published=True)
+        self.assignment5 = Assignment.objects.create(name="Assignment 5", course=self.course3)
+        self.assignment5.to_state_published()
+        self.assignment5.save()
         self.assignment6 = Assignment.objects.create(name="Assignment 6", course=self.course3)
 
     def test_student_course_view_no_assignments(self):
