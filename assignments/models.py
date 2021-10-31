@@ -1,3 +1,5 @@
+import random
+
 import pytz
 from autoslug import AutoSlugField
 from datetime import datetime, timedelta
@@ -20,17 +22,18 @@ class Assignment(models.Model):
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
     state = FSMField(default="unpublished", protected=True)
 
-    def can_publish(self):
-        if self.numQuestions() > 0 and self.due_date > utc.localize(datetime.now()):
-            return True
-        return False
-
     # publish assignment
     # preconditions:
     # assignment must have at least 1 question
     # class must have at least 1 student
     # postconditions:
     # assignment_submission and question_submission models will be created for every student in the class
+
+    def can_publish(self):
+        if self.numQuestions() > 0 and self.due_date > utc.localize(datetime.now()):
+            return True
+        return False
+
     @transition(field=state, source="unpublished", target="published", conditions=[can_publish])
     def to_state_published(self):
         # create assignment submissions for every student when assignment is published
@@ -39,6 +42,10 @@ class Assignment(models.Model):
             for question in self.questions.all():
                 QuestionSubmission.objects.create(AssignmentSubmission=assignment_submission, question=question)
 
+    # unpublish assignment
+    # postconditions:
+    # all assignment_submission and question_submission models will be deleted
+
     def can_unpublish(self):
         return True
 
@@ -46,6 +53,42 @@ class Assignment(models.Model):
     def to_state_unpublished(self):
         # delete all associated assignment submissions when assignment is unpublished
         self.assignment_submissions.all().delete()
+
+    # close assignment submissions
+    # preconditions:
+    # current datetime must be after due date
+    # postconditions:
+    # will create and assign peer reviews to students.
+
+    def can_close(self):
+        if self.numQuestions() > 0 and self.due_date <= utc.localize(datetime.now()):
+            return True
+        return False
+
+    @transition(field=state, source="published", target="closed", conditions=[can_close])
+    def to_state_closed(self):
+        unassignedStudents = []  # make dictionary for multiple peer reviews
+        for assignment_submission in self.assignment_submissions.filter(is_submitted=True):
+            for i in range(0, 1):
+                # get a student that has not yet been assigned a peer review
+                students = self.course.students.all()
+                student = random.choice(students)
+                while student not in unassignedStudents:
+                    student = random.choice(students)
+                unassignedStudents.append((student, ))
+
+                graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=self, grader=student)
+                for question_submission in assignment_submission.question_submissions:
+                    GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, QuestionSubmission=question_submission)
+
+    def can_graded(self):
+        return True
+
+    @transition(field=state, source="closed", target="graded", conditions=[can_graded])
+    def to_state_graded(self):
+        pass
+
+
 
     def __str__(self):
         return self.name
@@ -65,12 +108,6 @@ class Question(models.Model):
     point_value = models.IntegerField(validators=[MinValueValidator(0)])
     assignment = models.ForeignKey('Assignment', related_name='questions', on_delete=models.CASCADE, )
     index = models.IntegerField(validators=[MinValueValidator(1)])
-    # ordering = ['index']
-
-    # def getSubmissionByUser(self, user):
-    #     assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=self.assignment)
-    #     question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission, question=self)
-    #     return question_submission
 
 
 class AssignmentSubmission(models.Model):
@@ -92,3 +129,21 @@ class QuestionSubmission(models.Model):
                                              on_delete=models.CASCADE, )
     question = models.ForeignKey('Question', related_name='question_submissions', on_delete=models.CASCADE, )
     points = models.IntegerField(default=-1, )
+
+
+class GradedAssignmentSubmission(models.Model):
+    assignment_submission = models.ForeignKey('AssignmentSubmission', related_name='graded_assignment_submissions',
+                                              on_delete=models.CASCADE, )
+    grader = models.ForeignKey(peerGrader.settings.AUTH_USER_MODEL,
+                               related_name='peer_reviews',
+                               on_delete=models.CASCADE,
+                               limit_choices_to={'is_instructor': False}, )
+    is_submitted = models.BooleanField(default=False)
+
+
+class GradedQuestionSubmission(models.Model):
+    points = models.IntegerField(default=-1, )
+    GradedAssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='graded_question_submissions',
+                                                   on_delete=models.CASCADE, )
+    QuestionSubmission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
+                                           on_delete=models.CASCADE, )
