@@ -29,10 +29,6 @@ class AssignmentTestCase(TestCase):
 
 
 class AssignmentViewTestCase(TestCase):
-    def __init__(self, methodName: str = ...):
-        super().__init__(methodName)
-        self.Question = None
-
     def setUp(self):
         instructor = AppUser.objects.create(username="instructor1", is_instructor=True)
         instructor.set_password("password")
@@ -46,7 +42,7 @@ class AssignmentViewTestCase(TestCase):
 
         self.assignment1 = Assignment.objects.create(name="Assignment 1", course=course)
 
-        self.assignment2 = Assignment.objects.create(name="Assignment 1", course=course)
+        self.assignment2 = Assignment.objects.create(name="Assignment 2", course=course)
         self.question1 = Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment2)
         self.question2 = Question.objects.create(index=2, question_body="Question 2", point_value=2, assignment=self.assignment2)
         self.question3 = Question.objects.create(index=3, question_body="Question 3", point_value=3, assignment=self.assignment2)

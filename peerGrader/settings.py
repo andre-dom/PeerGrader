@@ -47,9 +47,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'nested_admin',
     'import_export',
-
-    #state
-    'fsm_admin2',
 ]
 
 # use our custom user model
