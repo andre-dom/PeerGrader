@@ -1,13 +1,18 @@
+import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
+import pytz
+from datetime import datetime, timedelta
 
 from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission, \
     GradedAssignmentSubmission
 from courses.models import Course
 
+utc = pytz.UTC
 
 class AssignmentView(DetailView):
     model = Assignment
@@ -268,6 +273,11 @@ class SubmitSubmission(UpdateView):
             return redirect('/')
         else:
             return super(SubmitSubmission, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        if form.instance.is_submitted:
+            form.instance.submitted_at = utc.localize(datetime.now())
+        return super(SubmitSubmission, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})

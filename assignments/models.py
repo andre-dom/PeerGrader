@@ -118,6 +118,7 @@ class AssignmentSubmission(models.Model):
     assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
     score = models.IntegerField(default=-1, )
     is_submitted = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(default=None, null=True)
 
     def __str__(self):
         return self.assignment.course.name + ", " + self.assignment.name + ": " + self.student.username

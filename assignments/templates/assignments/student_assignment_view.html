@@ -7,7 +7,14 @@
         </div>
         <hr>
         <div class="d-flex justify-content-between align-items-center">
-            <p>Due: {{ assignment.due_date }}</p>
+            <div>
+                <p>Due: {{ assignment.due_date }}</p>
+                {% if assignment_submission.is_submitted %}
+                    <p>Last submitted at: {{ assignment_submission.submitted_at }}</p>
+                {% else %}
+                    <p>Not yet submitted</p>
+                {% endif %}
+            </div>
             <a href="{% url 'assignments:submit_submission' assignment.slug %}"
                class="btn btn-outline-primary">Submit</a>
         </div>
