@@ -4,7 +4,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, DeleteView, UpdateView
 
-from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission
+from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission, \
+    GradedAssignmentSubmission
 from courses.models import Course
 
 
@@ -14,9 +15,12 @@ class AssignmentView(DetailView):
     slug_field = 'slug'
 
     def get_template_names(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
         if self.request.user.is_instructor:
             return 'assignments/instructor_assignment_view.html'
         else:
+            if assignment.state == "closed":
+                return 'assignments/closed/student_assignment_view.html'
             return 'assignments/student_assignment_view.html'
 
     # if student, pass assignment submission to context so they can preview their answers
@@ -27,6 +31,8 @@ class AssignmentView(DetailView):
             assignment = Assignment.objects.get(slug=self.kwargs['slug'])
             assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=assignment)
             context.update({"assignment_submission": assignment_submission})
+            if assignment.state == "closed":
+                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(grader=user, assignment=assignment)
         return context
 
     def dispatch(self, request, *args, **kwargs):
