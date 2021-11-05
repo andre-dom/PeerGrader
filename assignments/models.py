@@ -67,15 +67,15 @@ class Assignment(models.Model):
 
     @transition(field=state, source="published", target="closed", conditions=[can_close])
     def to_state_closed(self):
-        unassignedStudents = []  # make dictionary for multiple peer reviews
+        assignedStudents = []  # make dictionary for multiple peer reviews
         for assignment_submission in self.assignment_submissions.filter(is_submitted=True):
             for i in range(0, 1):
                 # get a student that has not yet been assigned a peer review
                 students = self.course.students.all()
                 student = random.choice(students)
-                while student not in unassignedStudents:
+                while student in assignedStudents or assignment_submission.student == student:
                     student = random.choice(students)
-                unassignedStudents.append((student, ))
+                assignedStudents.append((student, ))
 
                 graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=self, grader=student, assignment=self.assignment)
                 for question_submission in assignment_submission.question_submissions:
@@ -149,3 +149,4 @@ class GradedQuestionSubmission(models.Model):
                                                    on_delete=models.CASCADE, )
     QuestionSubmission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
                                            on_delete=models.CASCADE, )
+

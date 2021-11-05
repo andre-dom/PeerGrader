@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
+
 from .models import Course
 from assignments.models import Assignment
 
@@ -18,6 +19,7 @@ class QuestionInline(nested_admin.NestedTabularInline):
 class AssignmentAdmin(nested_admin.NestedModelAdmin):
     # add_form = AppUserCreationForm
     # form = AppUserChangeForm
+
     model = Assignment
     readonly_fields = ('name',)
     list_display = ('course',)
