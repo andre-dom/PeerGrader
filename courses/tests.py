@@ -151,7 +151,7 @@ class CourseViewTests(TestCase):
 
     def test_unauthorized_instructor_course_view(self):
         """
-        If a student is not enrolled in a course, dont show them the course page
+        If a instructor is not enrolled in a course, dont show them the course page
         """
         username = "instructor2"
         password = "password"
