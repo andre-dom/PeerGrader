@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Assignment: {{ assignment.name }}</h1>
+            <a class="btn btn-primary" href="{% url 'courses:view_course' assignment.course.slug %}">← Back</a>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <p>Due: {{ assignment.due_date }}</p>
+                {% if assignment_submission.is_submitted %}
+                    <p>Last submitted at: {{ assignment_submission.submitted_at }}</p>
+                {% else %}
+                    <p>Not yet submitted</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'assignments:submit_submission' assignment.slug %}"
+               class="btn btn-outline-primary">Submit</a>
+        </div>
+    </div>
+    {% if graded_question_submissions.all %}
+        {% for graded_question_submission in graded_question_submissions.all %}
+            <div class="card mt-3 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="d-inline">{{ graded_question_submission.question_submission.question.index }}. {{ graded_question_submission.question_submission.question.question_body }}
+                            ({{ graded_question_submission.question_submission.question.point_value }}
+                            point{{ graded_question_submission.question_submission.question.point_value|pluralize }})</h2>
+                    </div>
+                    <div>
+                        <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}"
+                           class="btn btn-outline-primary">Edit Answer</a>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <p>{{ graded_question_submission.question_submission.answer_body }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>There are no questions.</h3>
+    {% endif %}
+{% endblock content %}

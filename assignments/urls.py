@@ -16,4 +16,5 @@ urlpatterns = [
          name='delete_question'),
     path('<slug:assignment_slug>/submission/<int:index>', assignments.views.question_submission_edit_view, name='edit_submission'),
     path('<slug:assignment_slug>/submission/submit', assignments.views.submit_submission_view, name='submit_submission'),
+    path('<slug:assignment_slug>/review/<int:index>', assignments.views.edit_graded_assignment_submission_view, name='edit_graded_assignment_submission_view'),
 ]

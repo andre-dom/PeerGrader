@@ -313,6 +313,44 @@ class SubmitSubmission(UpdateView):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
+class EditGradedAssignmentSubmissionView(DetailView):
+    model = GradedAssignmentSubmission
+    template_name = 'review/edit_graded_assignment_view.html'
+    success_url = "/"
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        graded_assignment_submissions = GradedAssignmentSubmission.objects.get(grader=self.request.user,
+                                                                               index=self.kwargs['index'],
+                                                                               assignment=assignment)
+        return graded_assignment_submissions
+
+    def get_context_data(self, **kwargs):
+        context = super(EditGradedAssignmentSubmissionView, self).get_context_data(**kwargs)
+        user = self.request.user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        graded_assignment_submissions = GradedAssignmentSubmission.objects.get(grader=user,
+                                                                               index=self.kwargs['index'],
+                                                                               assignment=assignment)
+        context.update({"assignment": assignment})
+        context.update({"graded_assignment_submission": graded_assignment_submissions})
+        context.update({"graded_question_submissions": graded_assignment_submissions.graded_question_submissions})
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(EditGradedAssignmentSubmissionView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -323,6 +361,8 @@ assignment_close_view = login_required(CloseAssignment.as_view())
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
+
+edit_graded_assignment_submission_view = login_required(EditGradedAssignmentSubmissionView.as_view())
 
 question_submission_edit_view = login_required(EditQuestionSubmission.as_view())
 submit_submission_view = login_required(SubmitSubmission.as_view())

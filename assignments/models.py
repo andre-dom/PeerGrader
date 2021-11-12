@@ -77,7 +77,7 @@ class Assignment(models.Model):
                     student = random.choice(students)
                 assignedStudents.append((student, ))
 
-                graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=assignment_submission, grader=student, assignment=self)
+                graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=assignment_submission, grader=student, assignment=self, index=len(student.peer_reviews.all())+1)
                 for question_submission in assignment_submission.question_submissions.all():
                     GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, QuestionSubmission=question_submission)
 
@@ -139,12 +139,13 @@ class GradedAssignmentSubmission(models.Model):
                                on_delete=models.CASCADE,
                                limit_choices_to={'is_instructor': False}, )
     is_submitted = models.BooleanField(default=False)
+    index = models.IntegerField(validators=[MinValueValidator(1)])
 
 
 class GradedQuestionSubmission(models.Model):
     points = models.IntegerField(default=-1, )
     GradedAssignmentSubmission = models.ForeignKey('GradedAssignmentSubmission', related_name='graded_question_submissions',
                                                    on_delete=models.CASCADE, )
-    QuestionSubmission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
+    question_submission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
                                            on_delete=models.CASCADE, )
 
