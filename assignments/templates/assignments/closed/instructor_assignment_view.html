@@ -2,7 +2,7 @@
 {% block content %}
     <div>
         <div class="d-flex justify-content-between align-items-center">
-            <h1>Assignment: {{ assignment.name }}</h1>
+            <h1>Closed Assignment: {{ assignment.name }}</h1>
             <a class="btn btn-primary" href="{% url 'courses:view_course' assignment.course.slug %}">← Back</a>
         </div>
         <hr>

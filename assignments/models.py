@@ -77,8 +77,8 @@ class Assignment(models.Model):
                     student = random.choice(students)
                 assignedStudents.append((student, ))
 
-                graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=self, grader=student, assignment=self.assignment)
-                for question_submission in assignment_submission.question_submissions:
+                graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=assignment_submission, grader=student, assignment=self)
+                for question_submission in assignment_submission.question_submissions.all():
                     GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, QuestionSubmission=question_submission)
 
     def can_graded(self):
@@ -143,7 +143,7 @@ class GradedAssignmentSubmission(models.Model):
 
 class GradedQuestionSubmission(models.Model):
     points = models.IntegerField(default=-1, )
-    GradedAssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='graded_question_submissions',
+    GradedAssignmentSubmission = models.ForeignKey('GradedAssignmentSubmission', related_name='graded_question_submissions',
                                                    on_delete=models.CASCADE, )
     QuestionSubmission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
                                            on_delete=models.CASCADE, )

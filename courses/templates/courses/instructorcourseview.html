@@ -22,12 +22,16 @@
                         {% if Assignment.state == "published" %}
                             <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
                                class="btn btn-warning">Unpublish Assignment</a>
-                        {% else %}
+                            <a href="{% url 'assignments:close_assignment' Assignment.slug %}"
+                               class="btn btn-outline-primary">Close Assignment Submissions</a>
+                        {% elif Assignment.state == "unpublished" %}
                             <a href="{% url 'assignments:publish_assignment' Assignment.slug %}"
                                class="btn btn-outline-success">Publish</a>
                             <a href="{% url 'assignments:edit_assignment' Assignment.slug %}"
                                class="btn btn-outline-primary">Edit</a>
                             <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>
+                        {% elif Assignment.state == "closed" %}
+                            <p>Assignment is closed</p>
                         {% endif %}
                         <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
                            class="btn btn-primary">View</a>

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h2>Close assignment submissions</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to close "{{ object }}"?</p>
+        <button type="submit" value="Confirm" class="btn btn-danger mt-3">Close Assignment</button>
+        <a class="btn btn-outline-secondary mt-3" href="{%  url 'courses:view_course' object.course.slug %}">Cancel</a>
+    </form>
+{% endblock %}

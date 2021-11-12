@@ -14,6 +14,7 @@ from courses.models import Course
 
 utc = pytz.UTC
 
+
 class AssignmentView(DetailView):
     model = Assignment
     slug_url_kwarg = 'slug'
@@ -37,7 +38,9 @@ class AssignmentView(DetailView):
             assignment_submission = AssignmentSubmission.objects.get(student=user, assignment=assignment)
             context.update({"assignment_submission": assignment_submission})
             if assignment.state == "closed":
-                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(grader=user, assignment=assignment)
+                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(grader=user,
+                                                                                          assignment=assignment)
+                context.update({"graded_assignment_submissions": graded_assignment_submissions})
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -137,6 +140,33 @@ class PublishAssignment(UpdateView):
             return redirect('/')
         else:
             return super(PublishAssignment, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
+
+
+class CloseAssignment(UpdateView):
+    model = Assignment
+    template_name = 'assignments/close_assignment.html'
+    fields = ()
+    slug_url_kwarg = 'slug'
+    slug_field = 'slug'
+
+    def form_valid(self, form):
+        if form.instance.can_close():
+            form.instance.to_state_closed()
+        return super(CloseAssignment, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(CloseAssignment, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         assignment = Assignment.objects.get(slug=self.kwargs['slug'])
@@ -288,6 +318,7 @@ assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
 assignment_publish_view = login_required(PublishAssignment.as_view())
 assignment_edit_view = login_required(EditAssignment.as_view())
+assignment_close_view = login_required(CloseAssignment.as_view())
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
