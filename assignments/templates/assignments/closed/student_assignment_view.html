@@ -2,7 +2,7 @@
 {% block content %}
     <div>
         <div class="d-flex justify-content-between align-items-center">
-            <h1>Closed Assignment: {{ assignment.name }}</h1>
+            <h1>Peer Review: {{ assignment.name }}</h1>
             <a class="btn btn-primary" href="{% url 'courses:view_course' assignment.course.slug %}">← Back</a>
         </div>
         <hr>
@@ -11,18 +11,18 @@
             <a href="{% url 'assignments:submit_submission' assignment.slug %}" class="btn btn-outline-primary">Submit</a>
         </div>
     </div>
-    {% if assignment.questions.all %}
-        {% for question_submission in assignment_submission.question_submissions.all %}
+    {% if graded_assignment_submissions.all %}
+        {% for graded_assignment_submission in graded_assignment_submissions.all %}
             <div class="card mt-3 p-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="d-inline">{{ question_submission.question.index }}. {{ question_submission.question.question_body }} ({{ question_submission.question.point_value }} point{{ question_submission.question.point_value|pluralize }})</h2>
+                        <h2 class="d-inline">Review Complete: {{ graded_assignment_submission.is_submitted }}</h2>
                     </div>
-                    {% if assignment.state == 'closed' %}
-                        <div>
-                            <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}" class="btn btn-outline-primary">Edit Answer</a>
-                        </div>
-                    {% endif %}
+{#                    {% if assignment.state == 'closed' %}#}
+{#                        <div>#}
+{#                            <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}" class="btn btn-outline-primary">Edit Answer</a>#}
+{#                        </div>#}
+{#                    {% endif %}#}
                 </div>
                 <hr>
                 <div>

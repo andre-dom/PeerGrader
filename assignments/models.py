@@ -61,7 +61,7 @@ class Assignment(models.Model):
     # will create and assign peer reviews to students.
 
     def can_close(self):
-        if self.numQuestions() > 0 and self.due_date <= utc.localize(datetime.now()):
+        if self.state == "published":
             return True
         return False
 

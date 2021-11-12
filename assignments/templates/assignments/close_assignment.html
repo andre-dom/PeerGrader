@@ -2,11 +2,23 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2>Close assignment submissions</h2>
-    <form method="post">
-        {% csrf_token %}
-        <p>Are you sure you want to close "{{ object }}"?</p>
-        <button type="submit" value="Confirm" class="btn btn-danger mt-3">Close Assignment</button>
-        <a class="btn btn-outline-secondary mt-3" href="{%  url 'courses:view_course' object.course.slug %}">Cancel</a>
-    </form>
+    {% if assignment.can_close %}
+        <h2>Close assignment submissions</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to close "{{ object }}"?</p>
+            <button type="submit" value="Confirm" class="btn btn-danger mt-3">Close Assignment</button>
+            <a class="btn btn-outline-secondary mt-3"
+               href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
+        </form>
+    {% else %}
+        <h2>Before closing submissions assignment must have:</h2>
+        <ul>
+            <li>Been published</li>
+            <li>At least 1 question</li>
+            <li>A due date in the future</li>
+        </ul>
+        <a class="btn btn-outline-primary mt-3"
+           href="{% url 'courses:view_course' object.course.slug %}">← Back</a>
+    {% endif %}
 {% endblock %}
