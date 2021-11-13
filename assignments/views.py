@@ -50,10 +50,10 @@ class AssignmentView(DetailView):
         assignment = Assignment.objects.get(slug=self.kwargs['slug'])
         course = assignment.course
         user = request.user
-        if not (course.instructor == user or (user in course.students.all())):
-            return redirect('/')
-        else:
+        if (course.instructor == user) or (user in course.students.all() and assignment.state != "unpublished"):
             return super(AssignmentView, self).dispatch(request, *args, **kwargs)
+        else:
+            return redirect('/')
 
 
 class CreateAssignment(CreateView):
