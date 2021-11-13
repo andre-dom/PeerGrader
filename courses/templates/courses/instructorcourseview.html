@@ -35,7 +35,8 @@
                             <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>
                             <a href="{% url 'assignments:grade_assignment' Assignment.slug %}"class="btn btn-outline-primary">Grade Assignment</a>
                         {% elif Assignment.state == "graded" %}
-                            <a href="{% url 'assignments:get_grades_as_csv' Assignment.slug %}"class="btn btn-outline-primary">View Grades</a>
+                            <a href="{% url 'assignments:assignment_view_grades_view' Assignment.slug %}"class="btn btn-outline-primary">View Grades</a>
+{#                            <a href="{% url 'assignments:get_grades_as_csv' Assignment.slug %}"class="btn btn-outline-primary">View Grades</a>#}
                         {% endif %}
                         <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
                            class="btn btn-primary">View</a>

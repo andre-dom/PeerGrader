@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Grades for assignment: {{ assignment.name }}</h1>
+        <div>
+            <a href="{% url 'assignments:get_grades_as_csv' assignment.slug %}"class="btn btn-outline-primary">Download as CSV</a>
+            <a class="btn btn-primary" href="{% url 'courses:view_course' assignment.course.slug %}">← Back</a>
+        </div>
+    </div>
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Student</th>
+            <th scope="col">Grade</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for assignment_submission in assignment_submissions %}
+            <tr>
+                {#            <th scope="row">1</th>#}
+                <td>{{ assignment_submission.student.username }}</td>
+                {% if assignment_submission.is_submitted %}
+                    <td>{{ assignment_submission.getScore }}</td>
+                {% else %}
+                    <td>N/A</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

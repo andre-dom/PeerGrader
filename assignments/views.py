@@ -457,6 +457,31 @@ class SubmitGradedAssignmentView(UpdateView):
     #     return reverse_lazy('/', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
+class GradesView(DetailView):
+    model = Assignment
+    slug_url_kwarg = 'assignment_slug'
+    slug_field = 'slug'
+    template_name = 'assignments/view_grades.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(GradesView, self).get_context_data(**kwargs)
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        assignment_submissions = assignment.assignment_submissions.all()
+        context.update({"assignment": assignment})
+        context.update({"assignment_submissions": assignment_submissions})
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user != course.instructor:
+            return redirect('/')
+        else:
+            return super(GradesView, self).dispatch(request, *args, **kwargs)
+
+
 @login_required()
 def get_grades_as_csv(request, assignment_slug):
     # Create the HttpResponse object with the appropriate CSV header.
@@ -473,7 +498,7 @@ def get_grades_as_csv(request, assignment_slug):
         if assignment_submission.is_submitted:
             writer.writerow([assignment_submission.student, assignment_submission.getScore()])
         else:
-            writer.writerow([assignment_submission.student, '0'])
+            writer.writerow([assignment_submission.student, 'Not Submitted'])
 
     return response
 
@@ -485,6 +510,7 @@ assignment_publish_view = login_required(PublishAssignment.as_view())
 assignment_edit_view = login_required(EditAssignment.as_view())
 assignment_close_view = login_required(CloseAssignment.as_view())
 assignment_grade_view = login_required(GradeAssignment.as_view())
+assignment_view_grades_view = login_required(GradesView.as_view())
 get_grades_as_csv = login_required(get_grades_as_csv)
 
 question_edit_view = login_required(EditQuestion.as_view())
