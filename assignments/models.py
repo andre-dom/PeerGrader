@@ -86,7 +86,12 @@ class Assignment(models.Model):
 
     @transition(field=state, source="closed", target="graded", conditions=[can_graded])
     def to_state_graded(self):
-        pass
+        for assignment_submission in self.assignment_submissions.filter(is_submitted=True):
+            for question_submission in assignment_submission.question_submissions.all():
+                i = 0
+                for graded_question_submission in assignment_submission.graded_question_submissions.all():
+                    i += graded_question_submission.points
+                question_submission.points = i/len(assignment_submission.graded_question_submissions.all())
 
     def __str__(self):
         return self.name
