@@ -10,6 +10,7 @@ urlpatterns = [
     path('<slug:slug>/publishassignment/', assignments.views.assignment_publish_view, name='publish_assignment'),
     path('<slug:slug>/close_assignment/', assignments.views.assignment_close_view, name='close_assignment'),
     path('<slug:slug>/grade_assignment/', assignments.views.assignment_grade_view, name='grade_assignment'),
+    path('<slug:assignment_slug>/grades', assignments.views.get_grades_as_csv, name='get_grades_as_csv'),
     path('<slug:slug>/edit_assignment/', assignments.views.assignment_edit_view, name='edit_assignment'),
     path('<slug:assignment_slug>/newquestion/', assignments.views.question_create_view, name='create_question'),
     path('<slug:assignment_slug>/editquestion/<int:index>', assignments.views.question_edit_view, name='edit_question'),

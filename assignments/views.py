@@ -1,6 +1,8 @@
+import csv
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from django.urls import reverse_lazy
@@ -172,6 +174,7 @@ class CloseAssignment(UpdateView):
         assignment = Assignment.objects.get(slug=self.kwargs['slug'])
         return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
 
+
 class GradeAssignment(UpdateView):
     model = Assignment
     template_name = 'assignments/grade_assignment.html'
@@ -197,6 +200,7 @@ class GradeAssignment(UpdateView):
     def get_success_url(self, **kwargs):
         assignment = Assignment.objects.get(slug=self.kwargs['slug'])
         return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
+
 
 class CreateQuestion(CreateView):
     model = Question
@@ -453,6 +457,27 @@ class SubmitGradedAssignmentView(UpdateView):
     #     return reverse_lazy('/', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
+@login_required()
+def get_grades_as_csv(request, assignment_slug):
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="' + assignment_slug + '.csv"'},
+    )
+
+    writer = csv.writer(response)
+    assignment = Assignment.objects.get(slug=assignment_slug)
+    assignment_submissions = AssignmentSubmission.objects.filter(assignment=assignment)
+
+    for assignment_submission in assignment_submissions:
+        if assignment_submission.is_submitted:
+            writer.writerow([assignment_submission.student, assignment_submission.getScore()])
+        else:
+            writer.writerow([assignment_submission.student, '0'])
+
+    return response
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -460,6 +485,7 @@ assignment_publish_view = login_required(PublishAssignment.as_view())
 assignment_edit_view = login_required(EditAssignment.as_view())
 assignment_close_view = login_required(CloseAssignment.as_view())
 assignment_grade_view = login_required(GradeAssignment.as_view())
+get_grades_as_csv = login_required(get_grades_as_csv)
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
