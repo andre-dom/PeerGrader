@@ -9,7 +9,7 @@ import pytz
 from datetime import datetime, timedelta
 
 from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission, \
-    GradedAssignmentSubmission
+    GradedAssignmentSubmission, GradedQuestionSubmission
 from courses.models import Course
 
 utc = pytz.UTC
@@ -351,6 +351,51 @@ class EditGradedAssignmentSubmissionView(DetailView):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
+class EditGradedQuestionSubmissionView(UpdateView):
+    model = GradedQuestionSubmission
+    template_name = 'review/edit_graded_question_view.html'
+    fields = ('points',)
+    success_url = "/"
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        graded_assignment_submissions = GradedAssignmentSubmission.objects.get(grader=self.request.user,
+                                                                               index=self.kwargs['index'],
+                                                                               assignment=assignment)
+        question = Question.objects.get(assignment=assignment, index=self.kwargs['q_index'])
+        question_submission = QuestionSubmission.objects.get(
+            AssignmentSubmission=graded_assignment_submissions.assignment_submission, question=question)
+        graded_question_submission = GradedQuestionSubmission.objects.get(
+            GradedAssignmentSubmission=graded_assignment_submissions, question_submission=question_submission)
+
+        return graded_question_submission
+
+    def get_context_data(self, **kwargs):
+        context = super(EditGradedQuestionSubmissionView, self).get_context_data(**kwargs)
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        graded_assignment_submissions = GradedAssignmentSubmission.objects.get(grader=self.request.user,
+                                                                               index=self.kwargs['index'],
+                                                                               assignment=assignment)
+        question = Question.objects.get(assignment=assignment, index=self.kwargs['q_index'])
+        question_submission = QuestionSubmission.objects.get(
+            AssignmentSubmission=graded_assignment_submissions.assignment_submission, question=question)
+        context.update({"question_submission": question_submission})
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(EditGradedQuestionSubmissionView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -363,6 +408,7 @@ question_create_view = login_required(CreateQuestion.as_view())
 question_delete_view = login_required(DeleteQuestion.as_view())
 
 edit_graded_assignment_submission_view = login_required(EditGradedAssignmentSubmissionView.as_view())
+edit_graded_question_submission_view = login_required(EditGradedQuestionSubmissionView.as_view())
 
 question_submission_edit_view = login_required(EditQuestionSubmission.as_view())
 submit_submission_view = login_required(SubmitSubmission.as_view())
