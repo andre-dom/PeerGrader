@@ -28,10 +28,10 @@
                             ({{ graded_question_submission.question_submission.question.point_value }}
                             point{{ graded_question_submission.question_submission.question.point_value|pluralize }})</h2>
                     </div>
-                    <div>
-                        <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}"
-                           class="btn btn-outline-primary">Edit Answer</a>
-                    </div>
+{#                    <div>#}
+{#                        <a href="{% url 'assignments:edit_submission' assignment.slug question_submission.question.index %}"#}
+{#                           class="btn btn-outline-primary">Edit Answer</a>#}
+{#                    </div>#}
                 </div>
                 <hr>
                 <div>
