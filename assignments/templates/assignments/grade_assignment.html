@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    {% if assignment.can_graded %}
+        <h2>Grade assignment submissions</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to grade "{{ object }}"?</p>
+            <button type="submit" value="Confirm" class="btn btn-primary mt-3">Grade Assignment</button>
+            <a class="btn btn-outline-secondary mt-3"
+               href="{% url 'courses:view_course' object.course.slug %}">Cancel</a>
+        </form>
+    {% else %}
+        <h2>Before grading submissions:</h2>
+        <ul>
+            <li>NA</li>
+        </ul>
+        <a class="btn btn-outline-primary mt-3"
+           href="{% url 'courses:view_course' object.course.slug %}">← Back</a>
+    {% endif %}
+{% endblock %}

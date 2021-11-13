@@ -172,6 +172,31 @@ class CloseAssignment(UpdateView):
         assignment = Assignment.objects.get(slug=self.kwargs['slug'])
         return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
 
+class GradeAssignment(UpdateView):
+    model = Assignment
+    template_name = 'assignments/grade_assignment.html'
+    fields = ()
+    slug_url_kwarg = 'slug'
+    slug_field = 'slug'
+
+    def form_valid(self, form):
+        if form.instance.can_graded():
+            form.instance.to_state_graded()
+        return super(GradeAssignment, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        course = assignment.course
+        user = request.user
+        if not (course.instructor == user):
+            return redirect('/')
+        else:
+            return super(GradeAssignment, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        assignment = Assignment.objects.get(slug=self.kwargs['slug'])
+        return reverse_lazy('courses:view_course', kwargs={'slug': assignment.course.slug})
 
 class CreateQuestion(CreateView):
     model = Question
@@ -434,6 +459,7 @@ assignment_delete_view = login_required(DeleteAssignment.as_view())
 assignment_publish_view = login_required(PublishAssignment.as_view())
 assignment_edit_view = login_required(EditAssignment.as_view())
 assignment_close_view = login_required(CloseAssignment.as_view())
+assignment_grade_view = login_required(GradeAssignment.as_view())
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())

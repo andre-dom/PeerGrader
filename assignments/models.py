@@ -79,7 +79,7 @@ class Assignment(models.Model):
 
                 graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=assignment_submission, grader=student, assignment=self, index=len(student.peer_reviews.all())+1)
                 for question_submission in assignment_submission.question_submissions.all():
-                    GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, QuestionSubmission=question_submission)
+                    GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, question_submission=question_submission)
 
     def can_graded(self):
         return True
@@ -89,9 +89,10 @@ class Assignment(models.Model):
         for assignment_submission in self.assignment_submissions.filter(is_submitted=True):
             for question_submission in assignment_submission.question_submissions.all():
                 i = 0
-                for graded_question_submission in assignment_submission.graded_question_submissions.all():
+                for graded_question_submission in question_submission.graded_question_submissions.all():
                     i += graded_question_submission.points
-                question_submission.points = i/len(assignment_submission.graded_question_submissions.all())
+                question_submission.points = i/len(question_submission.graded_question_submissions.all())
+                question_submission.save()
 
     def __str__(self):
         return self.name
@@ -119,9 +120,14 @@ class AssignmentSubmission(models.Model):
                                 on_delete=models.CASCADE,
                                 limit_choices_to={'is_instructor': False}, )
     assignment = models.ForeignKey('Assignment', related_name='assignment_submissions', on_delete=models.CASCADE, )
-    score = models.IntegerField(default=-1, )
     is_submitted = models.BooleanField(default=False)
     submitted_at = models.DateTimeField(default=None, null=True)
+
+    def getScore(self):
+        t = 0
+        for q in self.question_submissions.all():
+            t += q.points
+        return t
 
     def __str__(self):
         return self.assignment.course.name + ", " + self.assignment.name + ": " + self.student.username
