@@ -139,6 +139,7 @@ class GradedAssignmentSubmission(models.Model):
                                on_delete=models.CASCADE,
                                limit_choices_to={'is_instructor': False}, )
     is_submitted = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(default=None, null=True)
     index = models.IntegerField(validators=[MinValueValidator(1)])
 
 

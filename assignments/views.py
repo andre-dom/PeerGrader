@@ -395,6 +395,7 @@ class EditGradedQuestionSubmissionView(UpdateView):
     def get_success_url(self, **kwargs):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
+
 class SubmitGradedAssignmentView(UpdateView):
     model = GradedAssignmentSubmission
     template_name = 'review/submit_review_view.html'
@@ -418,13 +419,14 @@ class SubmitGradedAssignmentView(UpdateView):
         else:
             return super(SubmitGradedAssignmentView, self).dispatch(request, *args, **kwargs)
 
-    # def form_valid(self, form):
-    #     # if form.instance.is_submitted:
-    #     #     form.instance.submitted_at = utc.localize(datetime.now())
-    #     return super(SubmitGradedAssignmentView, self).form_valid(form)
+    def form_valid(self, form):
+        if form.instance.is_submitted:
+            form.instance.submitted_at = utc.localize(datetime.now())
+        return super(SubmitGradedAssignmentView, self).form_valid(form)
 
     # def get_success_url(self, **kwargs):
     #     return reverse_lazy('/', kwargs={'slug': self.kwargs['assignment_slug']})
+
 
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
