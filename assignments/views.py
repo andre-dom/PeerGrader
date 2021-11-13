@@ -286,7 +286,7 @@ class EditQuestionSubmission(UpdateView):
 class SubmitSubmission(UpdateView):
     model = AssignmentSubmission
     template_name = 'submissions/submit_submission.html'
-    fields = ('is_submitted',)
+    fields = ()
     success_url = "/"
 
     def get_object(self):
@@ -305,8 +305,8 @@ class SubmitSubmission(UpdateView):
             return super(SubmitSubmission, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        if form.instance.is_submitted:
-            form.instance.submitted_at = utc.localize(datetime.now())
+        form.instance.is_submitted = True
+        form.instance.submitted_at = utc.localize(datetime.now())
         return super(SubmitSubmission, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
@@ -399,7 +399,7 @@ class EditGradedQuestionSubmissionView(UpdateView):
 class SubmitGradedAssignmentView(UpdateView):
     model = GradedAssignmentSubmission
     template_name = 'review/submit_review_view.html'
-    fields = ('is_submitted',)
+    fields = ()
     success_url = "/"
 
     def get_object(self):
@@ -420,8 +420,8 @@ class SubmitGradedAssignmentView(UpdateView):
             return super(SubmitGradedAssignmentView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        if form.instance.is_submitted:
-            form.instance.submitted_at = utc.localize(datetime.now())
+        form.instance.is_submitted = True
+        form.instance.submitted_at = utc.localize(datetime.now())
         return super(SubmitGradedAssignmentView, self).form_valid(form)
 
     # def get_success_url(self, **kwargs):
