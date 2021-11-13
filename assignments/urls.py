@@ -18,4 +18,5 @@ urlpatterns = [
     path('<slug:assignment_slug>/submission/submit', assignments.views.submit_submission_view, name='submit_submission'),
     path('<slug:assignment_slug>/review/<int:index>', assignments.views.edit_graded_assignment_submission_view, name='edit_graded_assignment_submission_view'),
     path('<slug:assignment_slug>/review/<int:index>/<int:q_index>', assignments.views.edit_graded_question_submission_view, name='edit_graded_question_submission_view'),
+    path('<slug:assignment_slug>/review/<int:index>/submit', assignments.views.submit_graded_assignment_view, name='submit_graded_assignment_view'),
 ]

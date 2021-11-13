@@ -15,7 +15,7 @@
                     <p>Not yet submitted</p>
                 {% endif %}
             </div>
-            <a href="{% url 'assignments:submit_submission' assignment.slug %}"
+            <a href="{% url 'assignments:submit_graded_assignment_view' assignment.slug graded_assignment_submission.index %}"
                class="btn btn-outline-primary">Submit</a>
         </div>
     </div>
@@ -29,7 +29,7 @@
                             point{{ graded_question_submission.question_submission.question.point_value|pluralize }})</h2>
                     </div>
                     <div>
-                        <a href="{% url 'assignments:edit_graded_question_submission_view' assignment.slug graded_question_submission.GradedAssignmentSubmission.index graded_question_submission.question_submission.question.index %}"
+                        <a href="{% url 'assignments:edit_graded_question_submission_view' assignment.slug graded_assignment_submission.index graded_question_submission.question_submission.question.index %}"
                            class="btn btn-outline-primary">Grade</a>
                     </div>
                 </div>
@@ -39,7 +39,5 @@
                 </div>
             </div>
         {% endfor %}
-    {% else %}
-        <h3>There are no questions.</h3>
     {% endif %}
 {% endblock content %}

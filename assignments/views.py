@@ -395,6 +395,36 @@ class EditGradedQuestionSubmissionView(UpdateView):
     def get_success_url(self, **kwargs):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
+class SubmitGradedAssignmentView(UpdateView):
+    model = GradedAssignmentSubmission
+    template_name = 'review/submit_review_view.html'
+    fields = ('is_submitted',)
+    success_url = "/"
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        graded_assignment_submissions = GradedAssignmentSubmission.objects.get(grader=self.request.user,
+                                                                               index=self.kwargs['index'],
+                                                                               assignment=assignment)
+        return graded_assignment_submissions
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(SubmitGradedAssignmentView, self).dispatch(request, *args, **kwargs)
+
+    # def form_valid(self, form):
+    #     # if form.instance.is_submitted:
+    #     #     form.instance.submitted_at = utc.localize(datetime.now())
+    #     return super(SubmitGradedAssignmentView, self).form_valid(form)
+
+    # def get_success_url(self, **kwargs):
+    #     return reverse_lazy('/', kwargs={'slug': self.kwargs['assignment_slug']})
 
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
@@ -409,6 +439,7 @@ question_delete_view = login_required(DeleteQuestion.as_view())
 
 edit_graded_assignment_submission_view = login_required(EditGradedAssignmentSubmissionView.as_view())
 edit_graded_question_submission_view = login_required(EditGradedQuestionSubmissionView.as_view())
+submit_graded_assignment_view = login_required(SubmitGradedAssignmentView.as_view())
 
 question_submission_edit_view = login_required(EditQuestionSubmission.as_view())
 submit_submission_view = login_required(SubmitSubmission.as_view())
