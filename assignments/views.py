@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from assignments.models import Assignment, Question, AssignmentSubmission, QuestionSubmission, \
     GradedAssignmentSubmission, GradedQuestionSubmission
 from courses.models import Course
+from users.models import AppUser
 
 utc = pytz.UTC
 
@@ -536,6 +537,33 @@ class StudentGradedQuestionView(DetailView):
         return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
 
 
+class InstructorSubmissionView(DetailView):
+    model = AssignmentSubmission
+    template_name = 'assignments/instructor_submission_view.html'
+    context_object_name = 'assignment_submission'
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        student = AppUser.objects.get(username=self.kwargs['username'])
+        assignment_submission = AssignmentSubmission.objects.get(assignment=assignment, student=student)
+        return assignment_submission
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user != course.instructor:
+            return redirect('/')
+        else:
+            return super(InstructorSubmissionView, self).dispatch(request, *args, **kwargs)
+
+    # def get_success_url(self, **kwargs):
+    #     assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+    #     return reverse_lazy('course:view_course', kwargs={'slug': assignment.course.slug})
+
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -546,6 +574,7 @@ assignment_grade_view = login_required(GradeAssignment.as_view())
 assignment_view_grades_view = login_required(GradesView.as_view())
 get_grades_as_csv = login_required(get_grades_as_csv)
 student_graded_question_view = login_required(StudentGradedQuestionView.as_view())
+instructor_submission_view = login_required(InstructorSubmissionView.as_view())
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
