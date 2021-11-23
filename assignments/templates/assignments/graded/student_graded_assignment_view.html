@@ -7,15 +7,16 @@
         </div>
         <hr>
         <div class="d-flex justify-content-between align-items-center">
-            <h2>Score: {{ assignment_submission.getScore }}/{{ assignment.pointTotal }} point{{ assignment.pointTotal|pluralize }}</h2>
-{#            <div>#}
-{#                <p>Due: {{ assignment.due_date }}</p>#}
-{#                {% if assignment_submission.is_submitted %}#}
-{#                    <p>Last submitted at: {{ assignment_submission.submitted_at }}</p>#}
-{#                {% else %}#}
-{#                    <p>Not yet submitted</p>#}
-{#                {% endif %}#}
-{#            </div>#}
+            <h2>Score: {{ assignment_submission.getScore }}/{{ assignment.pointTotal }}
+                point{{ assignment.pointTotal|pluralize }}</h2>
+            {#            <div>#}
+            {#                <p>Due: {{ assignment.due_date }}</p>#}
+            {#                {% if assignment_submission.is_submitted %}#}
+            {#                    <p>Last submitted at: {{ assignment_submission.submitted_at }}</p>#}
+            {#                {% else %}#}
+            {#                    <p>Not yet submitted</p>#}
+            {#                {% endif %}#}
+            {#            </div>#}
         </div>
     </div>
     {% if assignment.questions.all %}
@@ -28,8 +29,41 @@
                             point{{ question_submission.points|pluralize }})</h2>
                     </div>
                     <div>
-                        <a href="{% url 'assignments:student_graded_question_view' assignment.slug question_submission.question.index %}"
-                           class="btn btn-outline-primary">View Comments</a>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#commentsModal-{{ question_submission.question.index }}">
+                            View Grades
+                        </button>
+
+                        <!-- Comments Modal -->
+                        <div class="modal fade" id="commentsModal-{{ question_submission.question.index }}" tabindex="-1" role="dialog"
+                             aria-labelledby="commentsModalTitle" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="commentsModalLongTitle">Comments for Question
+                                            {{ question_submission.question.index }}: {{ question_submission.question.question_body }}</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <hr>
+                                        {% for graded_question_submissions in question_submission.graded_question_submissions.all %}
+                                            <h4>
+                                                Score: {{ graded_question_submissions.points }}/{{ question_submission.question.point_value }}
+                                                point{{ question_submission.points|pluralize }}</h4>
+                                            <h5>Comments: {{ graded_question_submissions.comment }}</h5>
+                                            <hr>
+                                        {% endfor %}
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {#                        <a href="{% url 'assignments:student_graded_question_view' assignment.slug question_submission.question.index %}"#}
+                        {#                           class="btn btn-outline-primary">View Comments</a>#}
                     </div>
                 </div>
                 <hr>

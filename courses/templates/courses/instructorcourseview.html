@@ -38,17 +38,17 @@
                         {% elif Assignment.state == "graded" %}
                             <!-- Button trigger modal -->
                             <button type="button" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#gradeModal">
+                                    data-target="#gradeModal-{{ Assignment.slug }}">
                                 View Grades
                             </button>
 
                             <!-- Grade Modal -->
-                            <div class="modal fade" id="gradeModal" tabindex="-1" role="dialog"
-                                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal fade" id="gradeModal-{{ Assignment.slug }}" tabindex="-1" role="dialog"
+                                 aria-labelledby="gradeModalTitle" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLongTitle">Grades for assignment: {{ Assignment.name }}</h5>
+                                            <h5 class="modal-title" id="gradeModalLongTitle">Grades for assignment: {{ Assignment.name }}</h5>
                                         </div>
                                         <div class="modal-body">
                                             <table class="table table-striped table-hover">
@@ -61,7 +61,6 @@
                                                 <tbody>
                                                 {% for assignment_submission in Assignment.assignment_submissions.all %}
                                                     <tr>
-                                                        {#            <th scope="row">1</th>#}
                                                         <td>{{ assignment_submission.student.username }}</td>
                                                         {% if assignment_submission.is_submitted %}
                                                             <td>{{ assignment_submission.getScore }}</td>
@@ -78,12 +77,11 @@
                                             </button>
                                             <a type="button" class="btn btn-primary"
                                                href="{% url 'assignments:get_grades_as_csv' Assignment.slug %}">Download
-                                                As CSV</a>
+                                                as CSV</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            {#                            <a href="{% url 'assignments:assignment_view_grades_view' Assignment.slug %}"class="btn btn-outline-primary">View Grades</a>#}
                         {% endif %}
                         <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
                            class="btn btn-primary">View</a>
