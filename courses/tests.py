@@ -51,9 +51,7 @@ class CourseViewTests(TestCase):
         """
         If there are no assignments, show a corresponding message
         """
-        username = "student1"
-        password = "password"
-        self.client.login(username=username, password=password)
+        self.client.login(username="student1", password="password")
         response = self.client.get(reverse('courses:view_course', kwargs={'slug': self.course2.slug}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "There are no assignments.")
@@ -69,7 +67,7 @@ class CourseViewTests(TestCase):
         response = self.client.get(reverse('courses:view_course', kwargs={'slug': self.course1.slug}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f"{self.assignment1.name}")
-        self.assertContains(response, f"{self.assignment2.name}")
+        self.assertNotContains(response, f"{self.assignment2.name}")
         self.assertContains(response, f"{self.assignment3.name}")
         self.assertQuerysetEqual(response.context['assignments'],
                                  [self.assignment1, self.assignment2, self.assignment3])

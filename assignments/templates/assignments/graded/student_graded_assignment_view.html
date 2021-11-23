@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Graded Assignment: {{ assignment.name }}</h1>
+            <a class="btn btn-primary" href="{% url 'courses:view_course' assignment.course.slug %}">← Back</a>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Score: {{ assignment_submission.getScore }}/{{ assignment.pointTotal }} point{{ assignment.pointTotal|pluralize }}</h2>
+{#            <div>#}
+{#                <p>Due: {{ assignment.due_date }}</p>#}
+{#                {% if assignment_submission.is_submitted %}#}
+{#                    <p>Last submitted at: {{ assignment_submission.submitted_at }}</p>#}
+{#                {% else %}#}
+{#                    <p>Not yet submitted</p>#}
+{#                {% endif %}#}
+{#            </div>#}
+        </div>
+    </div>
+    {% if assignment.questions.all %}
+        {% for question_submission in assignment_submission.question_submissions.all %}
+            <div class="card mt-3 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="d-inline">{{ question_submission.question.index }}. {{ question_submission.question.question_body }}
+                            ({{ question_submission.points }}/{{ question_submission.question.point_value }}
+                            point{{ question_submission.points|pluralize }})</h2>
+                    </div>
+                    <div>
+                        <a href="{% url 'assignments:student_graded_question_view' assignment.slug question_submission.question.index %}"
+                           class="btn btn-outline-primary">View Comments</a>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <p>{{ question_submission.answer_body }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>There are no questions.</h3>
+    {% endif %}
+{% endblock content %}

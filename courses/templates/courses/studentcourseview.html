@@ -16,7 +16,8 @@
                     <div>
                         <h2 class="d-inline">{{ Assignment.name }}</h2>
                     </div>
-                    <div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mx-3">Status: {{ Assignment.state }}</h5>
                         <a href="{% url 'assignments:view_assignment' Assignment.slug %}"
                            class="btn btn-primary">View</a>
                     </div>

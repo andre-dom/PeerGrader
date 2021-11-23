@@ -6,7 +6,7 @@ from courses.models import Course
 from users.models import AppUser
 
 
-class AssignmentTestCase(TestCase):
+class AssignmentModelTestCase(TestCase):
     def setUp(self):
         instructor = AppUser.objects.create(username="instructor1", password="password", is_instructor=True)
         student = AppUser.objects.create(username="student1", password="password")
@@ -26,6 +26,28 @@ class AssignmentTestCase(TestCase):
         """Test pointTotal returns the number of questions in the assignment"""
         assignment = Assignment.objects.get(name="Assignment 1")
         self.assertEqual(assignment.pointTotal(), 6)
+
+class ViewAssignmentTestCase(TestCase):
+    def setUp(self):
+        instructor = AppUser.objects.create(username="instructor1", is_instructor=True)
+        instructor.set_password("password")
+        instructor.save()
+        student = AppUser.objects.create(username="student1")
+        student.set_password("password")
+        student.save()
+
+        self.course1 = Course.objects.create(name="CS 101", instructor=instructor)
+        self.course1.students.add(student)
+        self.course1.save()
+
+        self.assignment1 = Assignment.objects.create(name="Assignment 1", course=self.course1, is_published=True)
+        # self.question1 = Question.objects.create(question_body="q1", index=1, point_value=5, assignment=self.assignment1)
+
+    def test1(self):
+        self.client.login(username="student1", password="password")
+        response = self.client.get(reverse('assignments:view_assignment', kwargs={'slug': self.assignment1.slug}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "There are no questions.")
 
 
 class AssignmentViewTestCase(TestCase):

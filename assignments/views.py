@@ -29,6 +29,8 @@ class AssignmentView(DetailView):
         else:
             if assignment.state == "closed":
                 return 'assignments/closed/student_assignment_view.html'
+            elif assignment.state == "graded":
+                return 'assignments/graded/student_graded_assignment_view.html'
             return 'assignments/student_assignment_view.html'
 
     # if student, pass assignment submission to context so they can preview their answers
@@ -42,6 +44,9 @@ class AssignmentView(DetailView):
             if assignment.state == "closed":
                 graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(grader=user,
                                                                                           assignment=assignment)
+                context.update({"graded_assignment_submissions": graded_assignment_submissions})
+            if assignment.state == "graded":
+                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(assignment_submission=assignment_submission)
                 context.update({"graded_assignment_submissions": graded_assignment_submissions})
         return context
 
@@ -503,6 +508,34 @@ def get_grades_as_csv(request, assignment_slug):
     return response
 
 
+class StudentGradedQuestionView(DetailView):
+    model = QuestionSubmission
+    template_name = 'assignments/graded/student_graded_question_view.html'
+    success_url = "/"
+    context_object_name = 'question_submission'
+
+    def get_object(self):
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        assignment_submission = AssignmentSubmission.objects.get(assignment=assignment, student=self.request.user)
+        question = Question.objects.get(assignment=assignment, index=self.kwargs['index'])
+        question_submission = QuestionSubmission.objects.get(AssignmentSubmission=assignment_submission,
+                                                             question=question)
+        return question_submission
+
+    def dispatch(self, request, *args, **kwargs):
+        # validate user
+        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+        course = assignment.course
+        user = request.user
+        if user not in course.students.all():
+            return redirect('/')
+        else:
+            return super(StudentGradedQuestionView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+
+
 assignment_detail_view = login_required(AssignmentView.as_view())
 assignment_create_view = login_required(CreateAssignment.as_view())
 assignment_delete_view = login_required(DeleteAssignment.as_view())
@@ -512,6 +545,7 @@ assignment_close_view = login_required(CloseAssignment.as_view())
 assignment_grade_view = login_required(GradeAssignment.as_view())
 assignment_view_grades_view = login_required(GradesView.as_view())
 get_grades_as_csv = login_required(get_grades_as_csv)
+student_graded_question_view = login_required(StudentGradedQuestionView.as_view())
 
 question_edit_view = login_required(EditQuestion.as_view())
 question_create_view = login_required(CreateQuestion.as_view())
