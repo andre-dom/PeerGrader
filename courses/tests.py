@@ -25,8 +25,6 @@ class CourseViewTests(TestCase):
         self.assignment1.save()
         self.assignment2 = Assignment.objects.create(name="Assignment 2", course=self.course1)
         Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment2)
-        self.assignment2.to_state_published()
-        self.assignment2.save()
         self.assignment3 = Assignment.objects.create(name="Assignment 3", course=self.course1)
         Question.objects.create(index=1, question_body="Question 1", point_value=1, assignment=self.assignment3)
         self.assignment3.to_state_published()
@@ -67,10 +65,10 @@ class CourseViewTests(TestCase):
         response = self.client.get(reverse('courses:view_course', kwargs={'slug': self.course1.slug}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f"{self.assignment1.name}")
-        self.assertContains(response, f"{self.assignment2.name}")
+        self.assertNotContains(response, f"{self.assignment2.name}")
         self.assertContains(response, f"{self.assignment3.name}")
         self.assertQuerysetEqual(response.context['assignments'],
-                                 [self.assignment1, self.assignment2, self.assignment3])
+                                 [self.assignment1, self.assignment3])
 
     def test_student_course_view_unpublished_assignments(self):
         """
