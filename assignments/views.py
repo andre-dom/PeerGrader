@@ -383,7 +383,7 @@ class EditGradedAssignmentSubmissionView(DetailView):
 class EditGradedQuestionSubmissionView(UpdateView):
     model = GradedQuestionSubmission
     template_name = 'review/edit_graded_question_view.html'
-    fields = ('points',)
+    fields = ('points', 'comment',)
     success_url = "/"
 
     def get_object(self):

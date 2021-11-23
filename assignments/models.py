@@ -20,7 +20,7 @@ class Assignment(models.Model):
                                     validators=[MinValueValidator(limit_value=utc.localize(datetime.now()))])
     course = models.ForeignKey('courses.Course', related_name='assignments', on_delete=models.CASCADE, )
     slug = AutoSlugField(populate_from='name', unique=True, editable=False)
-    state = FSMField(default="unpublished", protected=True)
+    state = FSMField(default="unpublished", )
 
     # publish assignment
     # preconditions:
@@ -80,6 +80,7 @@ class Assignment(models.Model):
                 graded_assignment_submission = GradedAssignmentSubmission.objects.create(assignment_submission=assignment_submission, grader=student, assignment=self, index=len(student.peer_reviews.all())+1)
                 for question_submission in assignment_submission.question_submissions.all():
                     GradedQuestionSubmission.objects.create(GradedAssignmentSubmission=graded_assignment_submission, question_submission=question_submission)
+
 
     def can_graded(self):
         return True
@@ -156,6 +157,7 @@ class GradedAssignmentSubmission(models.Model):
 
 class GradedQuestionSubmission(models.Model):
     points = models.IntegerField(default=-1, )
+    comment = models.TextField(default="")
     GradedAssignmentSubmission = models.ForeignKey('GradedAssignmentSubmission', related_name='graded_question_submissions',
                                                    on_delete=models.CASCADE, )
     question_submission = models.ForeignKey('QuestionSubmission', related_name='graded_question_submissions',
