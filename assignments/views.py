@@ -15,6 +15,9 @@ from assignments.models import Assignment, Question, AssignmentSubmission, Quest
 from courses.models import Course
 from users.models import AppUser
 
+import courses.graphs as graphs
+import numpy as np
+
 utc = pytz.UTC
 
 
@@ -47,7 +50,8 @@ class AssignmentView(DetailView):
                                                                                           assignment=assignment)
                 context.update({"graded_assignment_submissions": graded_assignment_submissions})
             if assignment.state == "graded":
-                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(assignment_submission=assignment_submission)
+                graded_assignment_submissions = GradedAssignmentSubmission.objects.filter(
+                    assignment_submission=assignment_submission)
                 context.update({"graded_assignment_submissions": graded_assignment_submissions})
         return context
 
@@ -475,17 +479,25 @@ class GradesView(DetailView):
         assignment_submissions = assignment.assignment_submissions.all()
         context.update({"assignment": assignment})
         context.update({"assignment_submissions": assignment_submissions})
+
+        scores = []
+        for submission in assignment.assignment_submissions.filter(is_submitted=True):
+            scores.append(submission.getScore())
+        context.update({"graph": graphs.generateGradeChart(scores, assignment.pointTotal())})
+        context.update({"mean": np.mean(scores)})
+        context.update({"median": np.median(scores)})
         return context
 
-    def dispatch(self, request, *args, **kwargs):
-        # validate user
-        assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
-        course = assignment.course
-        user = request.user
-        if user != course.instructor:
-            return redirect('/')
-        else:
-            return super(GradesView, self).dispatch(request, *args, **kwargs)
+
+def dispatch(self, request, *args, **kwargs):
+    # validate user
+    assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
+    course = assignment.course
+    user = request.user
+    if user != course.instructor:
+        return redirect('/')
+    else:
+        return super(GradesView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required()
@@ -561,7 +573,6 @@ class InstructorSubmissionView(DetailView):
     # def get_success_url(self, **kwargs):
     #     assignment = Assignment.objects.get(slug=self.kwargs['assignment_slug'])
     #     return reverse_lazy('course:view_course', kwargs={'slug': assignment.course.slug})
-
 
 
 assignment_detail_view = login_required(AssignmentView.as_view())

@@ -129,12 +129,15 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                            <div class="d-flex flex-column align-items-center">
+                                                <h4>Grade Distribution</h4>
+                                            </div>
                                             {% for k,v in graph_dict.items %}
                                                 {% if k == Assignment.slug %}
                                                     <div>
                                                         <img class="img-fluid" src="data:image/png;base64,{{ v.0|safe }}">
                                                     </div>
-                                                    <div class="d-flex justify-content-around align-items-center">
+                                                    <div class="d-flex justify-content-around align-items-center mb-3">
                                                         <h5>Mean: {{ v.1 }}</h5>
                                                         <h5>Median: {{ v.2 }}</h5>
                                                     </div>
