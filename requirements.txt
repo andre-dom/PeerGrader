@@ -7,3 +7,5 @@ django-autoslug~=1.9.8
 django-nested-admin~=3.3.3
 django-import-export~=2.6.1
 django-fsm
+numpy
+matplotlib

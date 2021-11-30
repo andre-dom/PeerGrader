@@ -84,7 +84,6 @@
                                     data-target="#submissionsModal-{{ Assignment.slug }}">
                                 View Submissions
                             </button>
-                            {#                            <p>Assignment is closed</p>#}
                             <a href="{% url 'assignments:delete_assignment' Assignment.slug %}" class="btn btn-danger">Delete</a>
                             <a href="{% url 'assignments:grade_assignment' Assignment.slug %}"
                                class="btn btn-outline-primary">Grade Assignment</a>
@@ -130,6 +129,13 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        <div>
+                                            {% for k,v in graph_dict.items %}
+                                                {% if k == Assignment.slug %}
+                                                    <img class="img-fluid" src="data:image/png;base64,{{ v|safe }}">
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
                                             </button>
@@ -174,4 +180,6 @@
         <h5 class="mt-5">There are no assignments. Would you like to <a
                 href="{% url 'assignments:create_assignment' course.slug %}">create one?</a></h5>
     {% endif %}
+
+    <script type="text/javascript" src="http://kozea.github.com/pygal.js/latest/pygal-tooltips.min.js"></script>
 {% endblock content %}

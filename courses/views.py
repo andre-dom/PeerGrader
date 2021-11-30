@@ -5,6 +5,11 @@ from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+import plotly
+import plotly.express as px
+import pandas as pd
+from . import graphs
+
 from courses.models import Course
 
 
@@ -17,9 +22,6 @@ def course_view(request, slug):
     if not (course.instructor == user or (user in course.students.all())):
         return redirect('/')
 
-    # dont show unpublished assignments to students
-    if user.is_instructor:
-        assignment_list = course.assignments.all().order_by('slug')
     else:
         assignment_list = course.assignments.filter(~Q(state="unpublished")).order_by('slug')
 
@@ -32,8 +34,21 @@ def course_view(request, slug):
     except EmptyPage:
         assignments = paginator.page(paginator.num_pages)
 
+
+    # dont show unpublished assignments to students, generate grade distribution graphs
+    graph_dict = {}
+    if user.is_instructor:
+        assignment_list = course.assignments.all().order_by('slug')
+        # graded_assignments = course.assignments.filter(state="graded")
+        for a in course.assignments.filter(state="graded").order_by('slug'):
+            scores = []
+            for submission in a.assignment_submissions.filter(is_submitted=True):
+                scores.append(submission.getScore())
+            # graph = graphs.generateGradeChart(scores, a.pointTotal())
+            graph_dict[a.slug] = graphs.generateGradeChart(scores, a.pointTotal())
+
     if request.user.is_instructor:
-        return render(request, 'courses/instructorcourseview.html', {'course': course, 'assignments': assignments, })
+        return render(request, 'courses/instructorcourseview.html', {'course': course, 'assignments': assignments, 'graph_dict' : graph_dict, })
     else:
         return render(request, 'courses/studentcourseview.html', {'course': course, 'assignments': assignments, })
 
