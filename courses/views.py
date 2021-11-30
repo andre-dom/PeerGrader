@@ -5,9 +5,6 @@ from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-import plotly
-import plotly.express as px
-import pandas as pd
 from . import graphs
 import numpy as np
 
