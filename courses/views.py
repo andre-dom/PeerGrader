@@ -9,6 +9,7 @@ import plotly
 import plotly.express as px
 import pandas as pd
 from . import graphs
+import numpy as np
 
 from courses.models import Course
 
@@ -45,7 +46,7 @@ def course_view(request, slug):
             for submission in a.assignment_submissions.filter(is_submitted=True):
                 scores.append(submission.getScore())
             # graph = graphs.generateGradeChart(scores, a.pointTotal())
-            graph_dict[a.slug] = graphs.generateGradeChart(scores, a.pointTotal())
+            graph_dict[a.slug] = (graphs.generateGradeChart(scores, a.pointTotal()), np.mean(scores), np.median(scores))
 
     if request.user.is_instructor:
         return render(request, 'courses/instructorcourseview.html', {'course': course, 'assignments': assignments, 'graph_dict' : graph_dict, })

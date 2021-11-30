@@ -129,13 +129,17 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div>
                                             {% for k,v in graph_dict.items %}
                                                 {% if k == Assignment.slug %}
-                                                    <img class="img-fluid" src="data:image/png;base64,{{ v|safe }}">
+                                                    <div>
+                                                        <img class="img-fluid" src="data:image/png;base64,{{ v.0|safe }}">
+                                                    </div>
+                                                    <div class="d-flex justify-content-around align-items-center">
+                                                        <h5>Mean: {{ v.1 }}</h5>
+                                                        <h5>Median: {{ v.2 }}</h5>
+                                                    </div>
                                                 {% endif %}
                                             {% endfor %}
-                                        </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
                                             </button>
