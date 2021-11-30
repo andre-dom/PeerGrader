@@ -22,7 +22,9 @@ def course_view(request, slug):
     # Make sure authenticated user is part of the course
     if not (course.instructor == user or (user in course.students.all())):
         return redirect('/')
-
+    # dont show unpublished assignments to students
+    if user.is_instructor:
+        assignment_list = course.assignments.all().order_by('slug')
     else:
         assignment_list = course.assignments.filter(~Q(state="unpublished")).order_by('slug')
 
@@ -36,7 +38,7 @@ def course_view(request, slug):
         assignments = paginator.page(paginator.num_pages)
 
 
-    # dont show unpublished assignments to students, generate grade distribution graphs
+    #generate grade distribution graphs and grade stats
     graph_dict = {}
     if user.is_instructor:
         assignment_list = course.assignments.all().order_by('slug')

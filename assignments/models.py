@@ -139,7 +139,7 @@ class QuestionSubmission(models.Model):
     AssignmentSubmission = models.ForeignKey('AssignmentSubmission', related_name='question_submissions',
                                              on_delete=models.CASCADE, )
     question = models.ForeignKey('Question', related_name='question_submissions', on_delete=models.CASCADE, )
-    points = models.IntegerField(default=-1, )
+    points = models.IntegerField(default=None, null=True)
 
 
 class GradedAssignmentSubmission(models.Model):
@@ -156,7 +156,7 @@ class GradedAssignmentSubmission(models.Model):
 
 
 class GradedQuestionSubmission(models.Model):
-    points = models.IntegerField(default=-1, )
+    points = models.IntegerField(default=None, null=True)
     comment = models.TextField(default="")
     GradedAssignmentSubmission = models.ForeignKey('GradedAssignmentSubmission', related_name='graded_question_submissions',
                                                    on_delete=models.CASCADE, )
