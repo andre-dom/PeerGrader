@@ -2,7 +2,8 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <h2>Question</h2>
+    <h2>Question Response</h2>
+    <h2 class="d-inline">{{ object.question.index }}. {{ object.question.question_body }} ({{ object.question.point_value }} point{{ object.question.point_value|pluralize }})</h2>
     <form method="post">
         {% csrf_token %}
         {{ form|crispy }}

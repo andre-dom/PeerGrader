@@ -432,7 +432,7 @@ class EditGradedQuestionSubmissionView(UpdateView):
             return super(EditGradedQuestionSubmissionView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('assignments:view_assignment', kwargs={'slug': self.kwargs['assignment_slug']})
+        return reverse_lazy('assignments:edit_graded_assignment_submission_view', kwargs={'assignment_slug': self.kwargs['assignment_slug'], 'index': self.kwargs['index']})
 
 
 class SubmitGradedAssignmentView(UpdateView):
@@ -463,8 +463,8 @@ class SubmitGradedAssignmentView(UpdateView):
         form.instance.submitted_at = utc.localize(datetime.now())
         return super(SubmitGradedAssignmentView, self).form_valid(form)
 
-    # def get_success_url(self, **kwargs):
-    #     return reverse_lazy('/', kwargs={'slug': self.kwargs['assignment_slug']})
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('assignments:edit_graded_assignment_submission_view', kwargs={'assignment_slug': self.kwargs['assignment_slug'], 'index': self.kwargs['index']})
 
 
 class GradesView(DetailView):

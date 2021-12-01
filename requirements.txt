@@ -9,3 +9,4 @@ django-import-export~=2.6.1
 django-fsm
 numpy
 matplotlib
+mysqlclient

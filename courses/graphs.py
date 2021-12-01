@@ -11,12 +11,8 @@ def generateGradeChart(data, maxScore):
     plt.ylabel('Num Students')
     plt.xlabel('Score')
     plt.tight_layout()
-    # plt.style.use('seaborn-pastel')
-    print(plt.style.available)
     plt.locator_params(axis="both", integer=True, tight=True)
     plt.xticks(np.arange(0, max(data) + 1, 1.0))
-
-
 
     buffer = BytesIO()
     plt.savefig(buffer, format='png')

@@ -3,7 +3,8 @@
 
 {% block content %}
     <h2>Review</h2>
-    <div class="card mt-3 mb-3 p-3">{{ question_submission.answer_body }}</div>
+    <h2 class="d-inline">{{ question_submission.question.index }}. {{ question_submission.question.question_body }} ({{ question_submission.question.point_value }} point{{ question_submission.question.point_value|pluralize }})</h2>
+    <div class="card mt-3 mb-3 p-3">Answer: {{ question_submission.answer_body }}</div>
     <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
